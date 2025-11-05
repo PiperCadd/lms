@@ -74,7 +74,13 @@ const page = () => {
               fields={loginFormFields}
               buttonName="Login"
               onSubmit={() => {}}
-              externalLink={[{ text: 'Forgot Password?', href: '/admin/auth/forgot', destination: 'above'}]}
+              externalLink={[
+                {
+                  text: "Forgot Password?",
+                  href: "/admin/auth/forgot",
+                  destination: "above",
+                },
+              ]}
             />
           </div>
           <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
@@ -91,6 +97,13 @@ const page = () => {
               fields={forgotPasswordFormFields}
               buttonName="Send"
               onSubmit={() => {}}
+              externalLink={[
+                {
+                  text: "Back to Login",
+                  href: "/admin/auth/login",
+                  destination: "below",
+                },
+              ]}
             />
           </div>
           <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
@@ -111,6 +124,13 @@ const page = () => {
               fields={resetPasswordFormFields}
               buttonName="Change Password"
               onSubmit={() => {}}
+              externalLink={[
+                {
+                  text: "Back to Login",
+                  href: "/admin/auth/login",
+                  destination: "below",
+                },
+              ]}
             />
           </div>
           <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">

@@ -35,7 +35,7 @@ export type FieldDefinition = {
 export type ExternalLink = {
   text: string;
   href: string;
-  destination?: 'above' | 'below';
+  destination?: "above" | "below";
 };
 
 export type CustomFormProps = {
@@ -47,7 +47,7 @@ export type CustomFormProps = {
   submitLabel?: string;
   className?: string;
   //zodSchema?: ZodObject<any> | null; // optional override
-  externalLink?: ExternalLink[];
+  externalLink?: ExternalLink[] | [];
 };
 
 // -----------------------------
@@ -93,9 +93,45 @@ export default function CustomForm({
   buttonName = "Submit",
   externalLink,
 }: CustomFormProps) {
+  const renderLinks = (destination: "above" | "below") => {
+    if (!externalLink) return null;
+
+    return (
+      <div
+        className={`flex ${
+          destination === "above"
+            ? "justify-end mb-4"
+            : "justify-start mt-4 space-x-2"
+        }`}
+      >
+        {externalLink
+          .filter((link) => link.destination === destination)
+          .map((link, index) =>
+            destination === "above" ? (
+              <Link
+                key={index}
+                href={link.href}
+                className="text-blue-500 hover:underline"
+              >
+                {link.text}
+              </Link>
+            ) : (
+              <Button
+                key={index}
+                onClick={() => (window.location.href = link.href)}
+                sx={{ background: "#181f4a",     border: "1px solid rgba(255, 255, 255, 0.15)", }}
+              >
+                {link.text}
+              </Button>
+            )
+          )}
+      </div>
+    );
+  };
+
   return (
     <form onSubmit={() => {}}>
-      <div className="mb-4">
+      <div className="">
         {fields.map((f) => (
           <FormField
             key={f.name}
@@ -106,21 +142,9 @@ export default function CustomForm({
           />
         ))}
       </div>
-      {externalLink?.map(({ text, href, destination }, index) => {
-        if (destination === "above") {
-          return (
-            <Link
-              key={index}
-              href={href}
-              className="text-blue-500 hover:underline ms-auto"
-            >
-              {text}
-            </Link>
-          );
-        }
-        return null;
-      })}
+      {renderLinks("above")}
       <Button variant="contained">{buttonName}</Button>
+      {renderLinks("below")}
     </form>
   );
 }

@@ -7,7 +7,6 @@ import {
   resetPasswordFormFields,
 } from "@/config/admin";
 import { Box, Typography } from "@mui/material";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
@@ -48,18 +47,7 @@ const page = () => {
                   marginBottom: "24px",
                 }}
               />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#fff",
-                  fontWeight: 500,
-                  whiteSpace: "nowrap",
-                  textTransform: "uppercase",
-                  marginBottom: "24px",
-                }}
-              >
-                Sign In With
-              </Typography>
+              <h2 className="uppercase mb-6 text-sm font-medium text-nowrap">Sign In With</h2>
               {/* Right Line */}
               <Box
                 sx={{
@@ -73,7 +61,7 @@ const page = () => {
             <CustomForm
               fields={loginFormFields}
               buttonName="Login"
-              onSubmit={() => {}}
+              apiEndpoint='/admin/login'
               externalLink={[
                 {
                   text: "Forgot Password?",
@@ -96,7 +84,7 @@ const page = () => {
             <CustomForm
               fields={forgotPasswordFormFields}
               buttonName="Send"
-              onSubmit={() => {}}
+              apiEndpoint=''
               externalLink={[
                 {
                   text: "Back to Login",
@@ -123,7 +111,7 @@ const page = () => {
             <CustomForm
               fields={resetPasswordFormFields}
               buttonName="Change Password"
-              onSubmit={() => {}}
+              apiEndpoint=''
               externalLink={[
                 {
                   text: "Back to Login",

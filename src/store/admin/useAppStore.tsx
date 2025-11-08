@@ -1,0 +1,31 @@
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+
+type AppState = {
+  tost: boolean;
+  setTost: (tost: boolean) => void;
+  clearTost: () => void;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+};
+
+export const useAppStore = create<AppState>()(
+  devtools(
+    persist(
+      (set) => ({
+        tost: false,
+        setTost: (t) => set({ tost: t }),
+        clearTost: () => set({ tost: false }),
+
+        theme: "light",
+        toggleTheme: () =>
+          set((state) => ({
+            theme: state.theme === "light" ? "dark" : "light",
+          })),
+      }),
+      {
+        name: "app-storage", // key for localStorage
+      }
+    )
+  )
+);

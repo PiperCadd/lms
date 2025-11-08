@@ -4,6 +4,7 @@ import {
   TextFieldProps,
   IconButton,
   InputAdornment,
+  MenuItem,
 } from "@mui/material";
 import { Eye, EyeClosed } from "lucide-react";
 
@@ -18,8 +19,9 @@ const TextField = ({
 
   // Only toggle password visibility if it's a password type
   const isPassword = type === "password";
+  const isNumber = type === "number";
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
-
+  
   return (
     <>
       <MuiTextField
@@ -37,7 +39,8 @@ const TextField = ({
           "& .MuiInputLabel-root": {
             position: "static",
             transform: "none",
-            fontWeight: 500,
+            fontSize: "0.875rem",
+            lineHeight: "calc(1.25 / 0.875)",
             color: "#e6ecf0",
             marginBottom: "4px",
           },
@@ -72,6 +75,13 @@ const TextField = ({
               </InputAdornment>
             ) : undefined,
           },
+          htmlInput: isNumber
+            ? {
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                min: 0,
+              }
+            : undefined,
         }}
       />
     </>

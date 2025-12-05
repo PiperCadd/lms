@@ -1,13 +1,88 @@
-'use client'
+'use client';
 
-export default function AdminRootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import * as React from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Noto_Sans } from "next/font/google";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import IconButton from "@mui/material/IconButton";
+import { AppBar as MuiAppBar, Toolbar as MuiToolbar } from "@mui/material";
+import { MenuOutlined } from "@mui/icons-material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { usePathname } from "next/navigation";
+
+import Drawer from "@/components/admin/Drawer";
+
+const notoSans = Noto_Sans({
+  variable: "--font-noto-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "var(--font-noto-sans)",
+  },
+});
+
+/**
+ * AdminRootLayout
+ *
+ * - Desktop: permanent collapsible drawer (handled via `open` state)
+ * - Tablet/Mobile: temporary overlay drawer (open state toggles modal drawer)
+ */
+export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md"));
+
+  // open state:
+  // - On desktop this controls collapsed/expanded (permanent drawer)
+  // - On mobile/tablet this controls overlay open/close
+  const [open, setOpen] = React.useState<boolean>(() => !isMobileOrTablet);
+
+  React.useEffect(() => {
+    // when screen size changes, make a sensible default
+    setOpen(!isMobileOrTablet);
+  }, [isMobileOrTablet]);
+
+  const handleDrawerToggle = () => setOpen((s) => !s);
+  const handleDrawerClose = () => setOpen(false);
+
+  // If we're on auth pages, render children only
+  if (pathname?.includes("auth")) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="relative w-full h-screen bg-[url('/admin/images/body-bg-1.webp')] bg-cover bg-center">
-      {children}
-    </div>
+    <ThemeProvider theme={theme}>
+      <div
+        className={`${notoSans.variable} relative w-full min-h-screen bg-[url('/admin/images/body-bg-1.webp')] bg-cover bg-center`}
+      >
+        <CssBaseline />
+
+        <Box sx={{ display: "flex" }}>
+          {/* Drawer: component decides permanent vs temporary based on breakpoints */}
+          <Drawer open={open} onClose={handleDrawerClose} onToggle={handleDrawerToggle} />
+
+          {/* Main area */}
+          <Box component="main" sx={{ flexGrow: 1, minHeight: "100vh" }}>
+            {/* Topbar */}
+            <MuiAppBar position="sticky" sx={{ background: "transparent", boxShadow: "none", zIndex: !open ? theme.zIndex.drawer + 1 : theme.zIndex.appBar, }}>
+              <MuiToolbar sx={{ justifyContent: "space-between" }}>
+                <IconButton color="inherit" onClick={handleDrawerToggle}>
+                  <MenuOutlined />
+                </IconButton>
+
+                {/* right actions placeholder */}
+                <div />
+              </MuiToolbar>
+            </MuiAppBar>
+
+            {/* Page content */}
+            {children}
+          </Box>
+        </Box>
+      </div>
+    </ThemeProvider>
   );
 }

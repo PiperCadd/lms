@@ -1,25 +1,6 @@
+import { NavItem } from "@/components/admin/Drawer";
 import { FieldDefinition } from "@/components/common/CustomForm";
-import {
-  LayoutDashboard,
-  BrickWallShield,
-  IdCardLanyard,
-  SquaresSubtract,
-  Shapes,
-  Languages,
-  UsersRound,
-  BookOpenText,
-  Presentation,
-  NotebookPen,
-  Users,
-  UserRoundCheck,
-  Image,
-  Megaphone,
-  TicketCheck,
-  MessageSquareMore,
-  CircleQuestionMark,
-  StickyNote,
-  Scroll,
-} from "lucide-react";
+import { AdminPanelSettings, Campaign, Category, Dashboard, Badge, Description, Feedback, Group, Help, Language, LocalOffer, MenuBook, People, Quiz, ReceiptLong, Slideshow, ViewModule, CheckCircle, Image } from "@mui/icons-material";
 
 export const loginFormFields = [
   {
@@ -65,34 +46,36 @@ export const resetPasswordFormFields = [
   },
 ] as const satisfies FieldDefinition[];
 
-export const quickNavigations = [
-  { name: "Dashboard", icon: LayoutDashboard },
-  { name: "Admin Portal", icon: BrickWallShield },
-  { name: "Designation", icon: IdCardLanyard },
-  { name: "Categories", icon: Shapes },
-  { name: "Sub Categories", icon: SquaresSubtract },
-  { name: "Languages", icon: Languages },
-  { name: "Team Members", icon: UsersRound },
+export const quickNavigations:NavItem[] = [
+  { name: "Dashboard", href: "/admin/dashboard", icon: Dashboard },
+  { name: "Admin Portal", href: "/", icon: AdminPanelSettings },
+  { name: "Designation", href: "/", icon: Badge },
+  { name: "Categories", href: "/", icon: Category },
+  { name: "Sub Categories", href: "/", icon: ViewModule },
+  { name: "Languages", href: "/",icon: Language },
+  { name: "Team Members", href: "/", icon: Group },
 ];
 
-export const courseManagementNavigations = [
-  { name: "Courses", icon: BookOpenText },
-  { name: "Lessons", icon: Presentation },
-  { name: "Quizzes", icon: NotebookPen },
+export const courseManagementNavigations:NavItem[] = [
+  { name: "Courses", href: "/", icon: MenuBook },
+  { name: "Lessons", href: "/", icon: Slideshow },
+  { name: "Quizzes", href: "/", icon: Quiz },
 ];
 
-export const userManagementNavigations = [
-  { name: "Learners", icon: Users },
-  { name: "Enrollments", icon: UserRoundCheck },
-]
-
-export const generalNavigations =[
-  { name: "Banner", icon: Image },
-  { name: "Announcements", icon: Megaphone },
-  { name: "Coupons", icon: TicketCheck },
-  { name: "Feedback", icon: MessageSquareMore },
-  { name: "FAQ", icon: CircleQuestionMark },
-  { name: "Pages", icon: StickyNote },
+export const userManagementNavigations:NavItem[] = [
+  { name: "Learners", href: "/", icon: People },
+  { name: "Enrollments", href: "/", icon: CheckCircle },
 ];
 
-export const reportsNavigations = [{ name: "Payment Report", icon: Scroll }];
+export const generalNavigations:NavItem[] = [
+  { name: "Banner", href: "/", icon: Image },
+  { name: "Announcements", href: "/", icon: Campaign },
+  { name: "Coupons", href: "/", icon: LocalOffer },
+  { name: "Feedback", href: "/", icon: Feedback },
+  { name: "FAQ", href: "/", icon: Help },
+  { name: "Pages", href: "/", icon: Description },
+];
+
+export const reportsNavigations:NavItem[] = [
+  { name: "Payment Report", href: "/", icon: ReceiptLong },
+];

@@ -4,9 +4,8 @@ import {
   TextFieldProps,
   IconButton,
   InputAdornment,
-  MenuItem,
 } from "@mui/material";
-import { Eye, EyeClosed } from "lucide-react";
+import { RemoveRedEyeOutlined, VisibilityOff } from "@mui/icons-material";
 
 const TextField = ({
   sx,
@@ -21,7 +20,7 @@ const TextField = ({
   const isPassword = type === "password";
   const isNumber = type === "number";
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
-  
+
   return (
     <>
       <MuiTextField
@@ -63,6 +62,7 @@ const TextField = ({
           // Add eye icon only for password fields
           inputLabel: { shrink: false },
           input: {
+            sx: { color: "#fff" }, // input text color
             endAdornment: isPassword ? (
               <InputAdornment position="end">
                 <IconButton
@@ -70,7 +70,7 @@ const TextField = ({
                   edge="end"
                   aria-label="toggle password visibility"
                 >
-                  {showPassword ? <Eye /> : <EyeClosed />}
+                  {showPassword ? <RemoveRedEyeOutlined /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ) : undefined,

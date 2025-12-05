@@ -6,13 +6,14 @@ import {
   loginFormFields,
   resetPasswordFormFields,
 } from "@/config/admin";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 type Mode = "login" | "forgot" | "reset";
 
-const page = () => {
+export default function Page() {
   const router = useRouter();
   const { mode } = useParams<{ mode: Mode }>();
 
@@ -47,7 +48,9 @@ const page = () => {
                   marginBottom: "24px",
                 }}
               />
-              <h2 className="uppercase mb-6 text-sm font-medium text-nowrap">Sign In With</h2>
+              <h2 className="uppercase mb-6 text-sm font-medium text-nowrap">
+                Sign In With
+              </h2>
               {/* Right Line */}
               <Box
                 sx={{
@@ -61,7 +64,7 @@ const page = () => {
             <CustomForm
               fields={loginFormFields}
               buttonName="Login"
-              apiEndpoint='/admin/login'
+              apiEndpoint="/admin/login"
               externalLink={[
                 {
                   text: "Forgot Password?",
@@ -71,8 +74,8 @@ const page = () => {
               ]}
             />
           </div>
-          <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
-            Image
+          <div className="relative bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
+            <Image src="/admin/images/login.webp" alt="" fill />
           </div>
         </>
       )}
@@ -84,7 +87,7 @@ const page = () => {
             <CustomForm
               fields={forgotPasswordFormFields}
               buttonName="Send"
-              apiEndpoint=''
+              apiEndpoint=""
               externalLink={[
                 {
                   text: "Back to Login",
@@ -94,8 +97,8 @@ const page = () => {
               ]}
             />
           </div>
-          <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
-            Image
+          <div className="relative bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
+            <Image src="/admin/images/forgot-password.webp" alt="" fill />
           </div>
         </>
       )}
@@ -111,7 +114,7 @@ const page = () => {
             <CustomForm
               fields={resetPasswordFormFields}
               buttonName="Change Password"
-              apiEndpoint=''
+              apiEndpoint=""
               externalLink={[
                 {
                   text: "Back to Login",
@@ -121,13 +124,11 @@ const page = () => {
               ]}
             />
           </div>
-          <div className="bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
-            Image
+          <div className="relative bg-[linear-gradient(310deg,#7928ca,#ff0080)] rounded-xl text-center">
+            <Image src="/admin/images/reset-password.webp" alt="" fill />
           </div>
         </>
       )}
     </div>
   );
-};
-
-export default page;
+}

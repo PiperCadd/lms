@@ -5,7 +5,8 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { Upload } from "lucide-react";
+import { Upload } from "@mui/icons-material";
+
 
 interface FileFieldProps extends Omit<TextFieldProps, "type"> {
   onFileSelect?: (file: File | null) => void;

@@ -6,7 +6,7 @@ import { Noto_Sans } from "next/font/google";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import IconButton from "@mui/material/IconButton";
-import { AppBar as MuiAppBar, Toolbar as MuiToolbar } from "@mui/material";
+import { Avatar, AppBar as MuiAppBar, Toolbar as MuiToolbar } from "@mui/material";
 import { MenuOutlined } from "@mui/icons-material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePathname } from "next/navigation";
@@ -72,9 +72,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
                 <IconButton color="inherit" onClick={handleDrawerToggle}>
                   <MenuOutlined />
                 </IconButton>
-
-                {/* right actions placeholder */}
-                <div />
+                <Avatar sx={{ backgroundColor: "#fff", color: "var(--admin-text-gray)" }}>A</Avatar>
               </MuiToolbar>
             </MuiAppBar>
 

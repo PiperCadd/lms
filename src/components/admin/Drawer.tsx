@@ -123,9 +123,7 @@ const Drawer: React.FC<Props> = ({ open, onClose, onToggle }) => {
               ${
                 isMobileOrTablet
                   ? "justify-start gap-3"
-                  : // : open
-                    // ? "justify-start gap-3"
-                    "justify-center gap-3"
+                  : "justify-center gap-3"
               }
               ${isActive ? "bg-white/10 text-white" : ""}
             `}

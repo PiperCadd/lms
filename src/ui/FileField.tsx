@@ -25,7 +25,6 @@ const FileField = ({ sx, onFileSelect, ...props }: FileFieldProps) => {
       variant="outlined"
       size="small"
       onChange={handleChange}
-      InputLabelProps={{ shrink: true }}
       sx={{
         width: "100%",
         marginBottom: "16px",
@@ -60,6 +59,7 @@ const FileField = ({ sx, onFileSelect, ...props }: FileFieldProps) => {
             </InputAdornment>
           ),
         },
+        inputLabel: {shrink: true}
       }}
     />
   );

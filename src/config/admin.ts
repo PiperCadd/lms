@@ -48,9 +48,9 @@ export const resetPasswordFormFields = [
 
 export const quickNavigations:NavItem[] = [
   { name: "Dashboard", href: "/admin/dashboard", icon: Dashboard },
-  { name: "Admin Portal", href: "/", icon: AdminPanelSettings },
-  { name: "Designation", href: "/", icon: Badge },
-  { name: "Categories", href: "/", icon: Category },
+  { name: "Admin Portal", href: "/admin/designation", icon: AdminPanelSettings },
+  { name: "Designation", href: "/admin/designation", icon: Badge },
+  { name: "Categories", href: "/admin/categories", icon: Category },
   { name: "Sub Categories", href: "/", icon: ViewModule },
   { name: "Languages", href: "/",icon: Language },
   { name: "Team Members", href: "/", icon: Group },

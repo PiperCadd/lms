@@ -3,8 +3,9 @@ import { devtools, persist } from "zustand/middleware";
 
 type AppState = {
   tost: boolean;
-  setTost: (tost: boolean) => void;
+  setTost: (t: boolean) => void;
   clearTost: () => void;
+
   theme: "light" | "dark";
   toggleTheme: () => void;
 };
@@ -24,7 +25,11 @@ export const useAppStore = create<AppState>()(
           })),
       }),
       {
-        name: "app-storage", // key for localStorage
+        name: "app-storage",
+        partialize: (state) => ({
+          tost: state.tost,
+          theme: state.theme,
+        }),
       }
     )
   )

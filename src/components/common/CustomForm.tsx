@@ -321,7 +321,7 @@ export default function CustomForm({
                 <Link
                   key={index}
                   href={link.href}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline text-sm font-medium"
                 >
                   {link.text}
                 </Link>

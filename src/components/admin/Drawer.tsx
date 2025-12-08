@@ -45,8 +45,8 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
-  backgroundColor: "var(--admin-body-bg-2)",
-  color: "var(--admin-text-gray)",
+  backgroundColor: "var(--admin-body-bg)",
+  color: "var(--admin-gray)",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -59,8 +59,8 @@ const closedMixin = (theme: Theme): CSSObject => ({
   [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
-  backgroundColor: "var(--admin-body-bg-2)",
-  color: "var(--admin-text-gray)",
+  backgroundColor: "var(--admin-body-bg)",
+  color: "var(--admin-gray)",
 });
 
 /* ---------------- STYLED PERMANENT DRAWER ---------------- */
@@ -215,8 +215,8 @@ const Drawer: React.FC<Props> = ({ open, onClose, onToggle }) => {
       PaperProps={{
         sx: {
           width: DRAWER_WIDTH,
-          backgroundColor: "var(--admin-body-bg-2)",
-          color: "var(--admin-text-gray)",
+          backgroundColor: "var(--admin-body-bg)",
+          color: "var(--admin-gray)",
         },
       }}
     >

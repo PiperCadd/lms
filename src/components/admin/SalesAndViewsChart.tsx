@@ -22,7 +22,7 @@ export default function SalesAndViewsCard({
   const leftSeries = mode === "month" ? [monthlyPercent] : [yearlyPercent];
 
   return (
-    <div className="bg-linear-to-b from-[#0f1624] to-[#0b1220] rounded-2xl p-5 md:p-6 shadow-xl h-fit overflow-hidden">
+    <div className="[background-image:var(--admin-bgimg)] bg-[var(--admin-card-bg)] rounded-2xl p-5 md:p-6 shadow-xl h-fit overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

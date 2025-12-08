@@ -48,7 +48,7 @@ export const resetPasswordFormFields = [
 
 export const quickNavigations:NavItem[] = [
   { name: "Dashboard", href: "/admin/dashboard", icon: Dashboard },
-  { name: "Admin Portal", href: "/admin/designation", icon: AdminPanelSettings },
+  // { name: "Admin Portal", href: "/admin/designation", icon: AdminPanelSettings },
   { name: "Designation", href: "/admin/designation", icon: Badge },
   { name: "Categories", href: "/admin/categories", icon: Category },
   { name: "Sub Categories", href: "/", icon: ViewModule },
@@ -79,3 +79,13 @@ export const generalNavigations:NavItem[] = [
 export const reportsNavigations:NavItem[] = [
   { name: "Payment Report", href: "/", icon: ReceiptLong },
 ];
+
+export const addDesignationFormFields = [
+  {
+    name: "designationName",
+    label: "Designation Name",
+    type: "text",
+    placeholder: "Eg: Marketing",
+    required: true,
+  },
+] as const satisfies FieldDefinition[];

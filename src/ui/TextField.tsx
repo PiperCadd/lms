@@ -43,6 +43,9 @@ const TextField = ({
             color: "#e6ecf0",
             marginBottom: "4px",
           },
+           "& .MuiInputLabel-root.Mui-focused": {
+      color: "#fff !important", // label when focused
+    },
           "& .MuiOutlinedInput-root": {
             marginTop: 0,
             "& fieldset": {
@@ -50,10 +53,10 @@ const TextField = ({
               borderColor: "rgba(255, 255, 255, 0.15)", // default border
             },
             "&:hover fieldset": {
-              borderColor: "blue",
+              borderColor: "var(--border-focus-color)",
             },
             "&.Mui-focused fieldset": {
-              borderColor: "green",
+              borderColor: "var(--border-focus-color)",
             },
           },
           ...sx,
@@ -70,7 +73,11 @@ const TextField = ({
                   edge="end"
                   aria-label="toggle password visibility"
                 >
-                  {showPassword ? <RemoveRedEyeOutlined /> : <VisibilityOff />}
+                  {showPassword ? (
+                    <RemoveRedEyeOutlined sx={{ color: "var(--admin-gray)" }} />
+                  ) : (
+                    <VisibilityOff sx={{ color: "var(--admin-gray)" }} />
+                  )}
                 </IconButton>
               </InputAdornment>
             ) : undefined,

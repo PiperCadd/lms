@@ -26,7 +26,7 @@ export default function Page() {
   }, [mode, router]);
 
   return (
-    <div className="absolute w-2/3 p-8 rounded-xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid md:grid-cols-2 gap-8 shadow-2xl bg-[linear-gradient(127.09deg,rgba(6,11,40,0.94)_19.41%,rgba(10,14,35,0.49)_76.65%)] text-white">
+    <div className="absolute w-2/3 min-h-2/4 p-8 rounded-xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid md:grid-cols-2 gap-8 shadow-2xl bg-[linear-gradient(127.09deg,rgba(6,11,40,0.94)_19.41%,rgba(10,14,35,0.49)_76.65%)] text-white">
       {mode === "login" && (
         <>
           <div className="">

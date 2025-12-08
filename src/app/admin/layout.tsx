@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import * as React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -6,7 +6,11 @@ import { Noto_Sans } from "next/font/google";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import IconButton from "@mui/material/IconButton";
-import { Avatar, AppBar as MuiAppBar, Toolbar as MuiToolbar } from "@mui/material";
+import {
+  Avatar,
+  AppBar as MuiAppBar,
+  Toolbar as MuiToolbar,
+} from "@mui/material";
 import { MenuOutlined } from "@mui/icons-material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePathname } from "next/navigation";
@@ -31,7 +35,11 @@ const theme = createTheme({
  * - Desktop: permanent collapsible drawer (handled via `open` state)
  * - Tablet/Mobile: temporary overlay drawer (open state toggles modal drawer)
  */
-export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
+export default function AdminRootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -48,38 +56,59 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   const handleDrawerToggle = () => setOpen((s) => !s);
   const handleDrawerClose = () => setOpen(false);
 
-  // If we're on auth pages, render children only
-  if (pathname?.includes("auth")) {
-    return <>{children}</>;
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <div
         className={`${notoSans.variable} relative w-full min-h-screen bg-[url('/admin/images/body-bg-1.webp')] bg-cover bg-center`}
       >
-        <CssBaseline />
+        {/* If we're on auth pages, render children only */}
+        {pathname?.includes("auth") ? (
+          <>{children}</>
+        ) : (
+          <>
+            <CssBaseline />
+            <Box sx={{ display: "flex" }}>
+              {/* Drawer: component decides permanent vs temporary based on breakpoints */}
+              <Drawer
+                open={open}
+                onClose={handleDrawerClose}
+                onToggle={handleDrawerToggle}
+              />
 
-        <Box sx={{ display: "flex" }}>
-          {/* Drawer: component decides permanent vs temporary based on breakpoints */}
-          <Drawer open={open} onClose={handleDrawerClose} onToggle={handleDrawerToggle} />
+              {/* Main area */}
+              <Box component="main" sx={{ flexGrow: 1, minHeight: "100vh" }}>
+                {/* Topbar */}
+                <MuiAppBar
+                  position="sticky"
+                  sx={{
+                    background: "transparent",
+                    boxShadow: "none",
+                    zIndex: !open
+                      ? theme.zIndex.drawer + 1
+                      : theme.zIndex.appBar,
+                  }}
+                >
+                  <MuiToolbar sx={{ justifyContent: "space-between" }}>
+                    <IconButton color="inherit" onClick={handleDrawerToggle}>
+                      <MenuOutlined />
+                    </IconButton>
+                    <Avatar
+                      sx={{
+                        backgroundColor: "#fff",
+                        color: "var(--admin-gray)",
+                      }}
+                    >
+                      A
+                    </Avatar>
+                  </MuiToolbar>
+                </MuiAppBar>
 
-          {/* Main area */}
-          <Box component="main" sx={{ flexGrow: 1, minHeight: "100vh" }}>
-            {/* Topbar */}
-            <MuiAppBar position="sticky" sx={{ background: "transparent", boxShadow: "none", zIndex: !open ? theme.zIndex.drawer + 1 : theme.zIndex.appBar, }}>
-              <MuiToolbar sx={{ justifyContent: "space-between" }}>
-                <IconButton color="inherit" onClick={handleDrawerToggle}>
-                  <MenuOutlined />
-                </IconButton>
-                <Avatar sx={{ backgroundColor: "#fff", color: "var(--admin-text-gray)" }}>A</Avatar>
-              </MuiToolbar>
-            </MuiAppBar>
-
-            {/* Page content */}
-            {children}
-          </Box>
-        </Box>
+                {/* Page content */}
+                {children}
+              </Box>
+            </Box>
+          </>
+        )}
       </div>
     </ThemeProvider>
   );

@@ -22,7 +22,7 @@ export default function Stats({ stats }: { stats: StatItem[] }) {
         return (
           <div
             key={idx}
-            className="bg-linear-to-b from-[#0f1624] to-[#111827] rounded-2xl p-4 shadow-sm"
+            className="[background-image:var(--admin-bgimg)] bg-[var(--admin-card-bg)] rounded-2xl p-4 shadow-sm"
           >
               <div className="text-white text-lg font-semibold">{s.value}</div>
               <div className="text-sm text-gray-300">{s.title}</div>

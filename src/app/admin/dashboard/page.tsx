@@ -90,7 +90,7 @@ const Page: React.FC = () => {
 
   return (
     <main className="text-white p-6">
-      <h1 className="text-2xl m-4">Dashboard</h1>
+      <h1 className="text-2xl mb-4">Dashboard</h1>
       {loading ? (
         <>
           <div className="mb-6">

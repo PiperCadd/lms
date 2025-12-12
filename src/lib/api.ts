@@ -5,7 +5,7 @@ const API = axios.create({
   withCredentials: true, // optional
 });
 
-// ⭐ Optional: attach auth token automatically
+// Optional: attach auth token automatically
 API.interceptors.request.use((config) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 

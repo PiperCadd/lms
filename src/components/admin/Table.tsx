@@ -1,10 +1,5 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-
 import {
   DataGrid,
   GridColDef,
@@ -15,272 +10,405 @@ import {
   GridRowModel,
   GridRowsProp,
   GridToolbarContainer,
-  GridRowEditStopParams,
-  GridRowEditStopReasons,
+  GridRowParams,
   useGridApiRef,
 } from "@mui/x-data-grid";
-import CrudActions from "@/ui/CurdActions";
-
-interface EditToolbarProps {
-  setRows: React.Dispatch<React.SetStateAction<GridRowsProp>>;
-  setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>;
-}
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
+import Button from "@mui/material/Button";
+import { useConfirmDialogStore } from "@/hooks/admin/useConfirmDialogStore";
 
 interface TableProps {
   rows: GridRowsProp;
   columns: GridColDef[];
+  renderActions?: (
+    params: GridRowParams,
+    handlers: {
+      edit: () => void;
+      delete: () => void;
+      save: () => void;
+      cancel: () => void;
+      toggle: () => void;
+    }
+  ) => React.ReactElement[];
+  onSave?: (row: GridRowModel) => void;
+  onDelete?: (id: GridRowId) => void;
+  onEdit?: (id: GridRowId) => void;
+  onCancel?: (id: GridRowId) => void;
+  onAdd?: () => void;
+  onToggle?: (id: GridRowId, value: boolean) => void;
 }
 
-function EditToolbar({ setRows, setRowModesModel }: EditToolbarProps) {
-  const handleClick = () => {
-    const id = Date.now();
-
-    setRows((prev) => [
-      { id, firstName: "", lastName: "", age: null, isNew: true },
-      ...prev,
-    ]);
-
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "firstName" },
-    }));
-  };
-
+function EditToolbar({ onAdd }: { onAdd?: () => void }) {
   return (
     <GridToolbarContainer>
-      <Button startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
-      </Button>
+      {onAdd && (
+        <Button startIcon={<AddIcon />} onClick={onAdd}>
+          Add
+        </Button>
+      )}
     </GridToolbarContainer>
   );
 }
 
-export default function Table({ rows, columns }: TableProps) {
+function findIndexById(rows: GridRowsProp, id: GridRowId) {
+  return rows.findIndex((r: any) => r.id === id);
+}
+
+const OptimizedTable: React.FC<TableProps> = ({
+  rows,
+  columns,
+  renderActions,
+  onAdd,
+  onEdit,
+  onSave,
+  onDelete,
+  onCancel,
+  onToggle
+}) => {
   const apiRef = useGridApiRef();
 
-  const [row, setRows] = React.useState(rows);
+  // Keep data in state but sync when `rows` prop changes.
+  const [data, setData] = React.useState<GridRowsProp>(rows);
+  React.useEffect(() => setData(rows), [rows]);
+
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
 
-  const handleRowEditStop = (
-    params: GridRowEditStopParams,
-    event: React.SyntheticEvent
-  ) => {
-    // prevent edit mode exit on blur
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
-  };
+  // Pull dialog methods once to avoid repeated getter calls.
+  const { showDialog, closeDialog, setLoading } = useConfirmDialogStore();
 
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.Edit },
-    }));
-  };
+  // Refs for callbacks to avoid stale closures and unnecessary deps
+  const onDeleteRef = React.useRef(onDelete);
+  React.useEffect(() => {
+    onDeleteRef.current = onDelete;
+  }, [onDelete]);
 
-  const handleSaveClick = (id: GridRowId) => () => {
-    apiRef.current.stopRowEditMode({ id });
-  };
+  const onEditRef = React.useRef(onEdit);
+  React.useEffect(() => {
+    onEditRef.current = onEdit;
+  }, [onEdit]);
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows((prev) => prev.filter((row) => row.id !== id));
-  };
+  const onCancelRef = React.useRef(onCancel);
+  React.useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
 
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    }));
+  const onSaveRef = React.useRef(onSave);
+  React.useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
 
-    const row = apiRef.current.getRow(id);
-    if (row?.isNew) {
-      setRows((prev) => prev.filter((r) => r.id !== id));
-    }
-  };
+  const onToggleRef = React.useRef(onToggle);
+  React.useEffect(() => {
+    onToggleRef.current = onToggle;
+  }, [onToggle]);
 
-  const processRowUpdate = React.useCallback((newRow: GridRowModel) => {
-    const updated = { ...newRow, isNew: false };
-    setRows((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
-    return updated;
-  }, []);
-
-  const column: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 90 },
-    {
-      field: "firstName",
-      headerName: "First name",
-      width: 150,
-      editable: true,
+  // Handlers (stable via useCallback)
+  const handleEditClick = React.useCallback(
+    (id: GridRowId) => () => {
+      setRowModesModel((prev) => ({
+        ...prev,
+        [id]: { mode: GridRowModes.Edit },
+      }));
+      onEditRef.current?.(id);
     },
-    { field: "lastName", headerName: "Last name", width: 150, editable: true },
-    {
-      field: "age",
-      headerName: "Age",
-      width: 110,
-      type: "number",
-      editable: true,
+    []
+  );
+
+  const handleCancelClick = React.useCallback(
+    (id: GridRowId) => () => {
+      setRowModesModel((prev) => ({
+        ...prev,
+        [id]: { mode: GridRowModes.View, ignoreModifications: true },
+      }));
+      onCancelRef.current?.(id);
     },
+    []
+  );
 
-    {
-      field: "fullName",
-      headerName: "Full name",
-      width: 160,
-      valueGetter: (params) =>
-        `${params?.row?.firstName ?? ""} ${params?.row?.lastName ?? ""}`,
+  const handleSaveClick = React.useCallback(
+    (id: GridRowId) => () => {
+      showDialog({
+        title: "Save Changes?",
+        description: "Do you want to update this record?",
+        confirmText: "Save",
+        onConfirm: () => {
+          // Stop edit mode (this will call processRowUpdate)
+          apiRef.current.stopRowEditMode({ id });
+          closeDialog();
+        },
+      });
     },
+    [apiRef, showDialog, closeDialog]
+  );
 
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      width: 260,
-      getActions: ({ id }) => {
-        const isEditing = rowModesModel[id]?.mode === GridRowModes.Edit;
+  const handleDeleteClick = React.useCallback(
+    (id: GridRowId) => () => {
+      showDialog({
+        title: "Delete Record?",
+        description: "This action cannot be undone.",
+        confirmText: "Delete",
+        isDestructive: true,
+        onConfirm: async () => {
+          setLoading(true);
+          // Optimized remove by index
+          setData((prev) => {
+            const idx = findIndexById(prev, id);
+            if (idx === -1) return prev;
+            const clone = [...prev];
+            clone.splice(idx, 1);
+            return clone;
+          });
+          onDeleteRef.current?.(id);
+          setLoading(false);
+          closeDialog();
+        },
+      });
+    },
+    [showDialog, setLoading, closeDialog]
+  );
 
-        if (isEditing) {
-          return [
-            <GridActionsCellItem
-              key="save"
-              icon={<SaveIcon />}
-              label="Save"
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              key="cancel"
-              icon={<CancelIcon />}
-              label="Cancel"
-              onClick={handleCancelClick(id)}
-            />,
-          ];
-        }
+ const handleToggleClick = React.useCallback(
+  (params: GridRowParams) => (event: React.MouseEvent) => {
+    
+    // ⭐ FIX: remove focus BEFORE dialog opens
+    (event.currentTarget as HTMLElement).blur();
 
+    const id = params.id;
+    const isActive = params.row.isActive;
+
+    showDialog({
+      title: isActive ? "Deactivate Item?" : "Activate Item?",
+      description: `Do you want to ${isActive ? "deactivate" : "activate"} this item?`,
+      confirmText: isActive ? "Deactivate" : "Activate",
+      onConfirm: async () => {
+        setLoading(true);
+
+        setData((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, isActive: !isActive } : item
+          )
+        );
+
+        onToggleRef.current?.(id, !isActive);
+
+        setLoading(false);
+        closeDialog();
+      },
+    });
+  },
+  [showDialog, closeDialog, setLoading]
+);
+
+
+
+  // processRowUpdate: minimal work and id-based update for performance
+  const processRowUpdate = React.useCallback(
+    (newRow: any) => {
+      // Basic validation: return previous row if invalid (don't throw)
+      if (!newRow.name) {
+        // you can integrate toast/notification here instead of throwing
+        // keep grid stable by returning the previous state for this row
+        const prevIdx = findIndexById(data, newRow.id);
+        return data[prevIdx] ?? newRow;
+      }
+
+      setData((prev) => {
+        const idx = findIndexById(prev, newRow.id);
+        if (idx === -1) return prev;
+        const clone = [...prev];
+        clone[idx] = { ...clone[idx], ...newRow };
+        return clone;
+      });
+
+      onSaveRef.current?.(newRow);
+      return newRow;
+    },
+    [data]
+  );
+
+  // getActions separated and memoized to avoid regenerating entire columns array
+  const getActions = React.useCallback(
+    (params: GridRowParams) => {
+      const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+
+      if (isEditing) {
         return [
-          <CrudActions
-            key="delete"
-            edit
-            delete
-            toggle
-            isActive={true}
-            onEdit={handleEditClick(id)}
-            onDelete={handleDeleteClick(id)}
+          <GridActionsCellItem
+            key="save"
+            icon={<SaveIcon />}
+            label="Save"
+            onClick={handleSaveClick(params.id)}
+          />,
+          <GridActionsCellItem
+            key="cancel"
+            icon={<CancelIcon />}
+            label="Cancel"
+            onClick={handleCancelClick(params.id)}
           />,
         ];
-      },
+      }
+
+      if (renderActions) {
+        return renderActions(params, {
+          edit: handleEditClick(params.id),
+          delete: handleDeleteClick(params.id),
+          save: handleSaveClick(params.id),
+          cancel: handleCancelClick(params.id),
+          toggle: handleToggleClick(params),
+        });
+      }
+
+      return [
+        <GridActionsCellItem
+          key="edit"
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={handleEditClick(params.id)}
+        />,
+        <GridActionsCellItem
+          key="delete"
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={handleDeleteClick(params.id)}
+        />,
+      ];
     },
-  ];
+    [
+      rowModesModel,
+      renderActions,
+      handleEditClick,
+      handleDeleteClick,
+      handleSaveClick,
+      handleCancelClick,
+      handleToggleClick
+    ]
+  );
+
+  const mergedColumns: GridColDef[] = React.useMemo(() => {
+    return [
+      ...columns,
+      {
+        field: "actions",
+        type: "actions",
+        headerName: "Actions",
+        width: 160,
+        getActions,
+      },
+    ];
+  }, [columns, getActions]);
+
+  // Memoize SX to avoid creating a new object on every render
+  const gridSx = React.useMemo(
+    () => ({
+      backgroundImage: "var(--admin-bgimg)",
+      backgroundColor: "var(--admin-card-bg)",
+      borderRadius: "var(--border-radius-lg)",
+      color: "var(--admin-text-white)",
+      padding: "16px",
+      border: "none",
+      "& .MuiCheckbox-root": { color: "#fff !important" },
+      "& .MuiDataGrid-main": {
+        borderTopLeftRadius: "var(--border-radius-sm)",
+        borderTopRightRadius: "var(--border-radius-sm)",
+        overflow: "hidden",
+      },
+      "& .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderTitleContainer .MuiCheckbox-root":
+        {
+          color: "#000 !important",
+        },
+      "& .MuiDataGrid-columnHeader .Mui-checked": {
+        color: "#1976d2 !important",
+      },
+      "& .Mui-checked": {
+        color: "var(--admin-text-white) !important",
+      },
+      "& .MuiCheckbox-root:hover": {
+        backgroundColor: "rgba(255,255,255,0.1) !important",
+      },
+      "& .Mui-focusVisible": { outline: "none" },
+      "& .MuiDataGrid-row.Mui-selected": {
+        backgroundColor: "var(--white-10)",
+      },
+      "& .MuiDataGrid-row.Mui-selected:hover": {
+        backgroundColor: "var(--white-20)",
+      },
+      "& .MuiDataGrid-row:hover": { backgroundColor: "transparent" },
+      "& .MuiDataGrid-columnHeader": { color: "#000" },
+      "& .MuiDataGrid-columnHeaderTitle": {
+        color: "#000",
+        fontWeight: 700,
+        fontSize: "0.8rem",
+        textTransform: "uppercase",
+      },
+      "& .MuiDataGrid-columnHeaders": {
+        backgroundColor: "#ffffff",
+      },
+      "& .MuiDataGrid-footerContainer": {
+        borderTop: "none !important",
+      },
+      "& .MuiDataGrid-footerContainer .MuiDataGrid-pagination": {
+        borderTop: "none !important",
+        color: "var(--admin-text-white)",
+      },
+      "& .MuiTablePagination-title": { color: "#fff" },
+      "& .MuiTablePagination-displayedRows": { color: "#fff" },
+      "& .MuiTablePagination-selectLabel": { color: "#fff" },
+      "& .MuiTablePagination-select": { color: "#fff" },
+      "& .MuiTablePagination-actions svg": { fill: "#fff" },
+      // Highest-specificity selector for editing row
+      "& .MuiDataGrid-virtualScrollerRenderZone > div.MuiDataGrid-row.MuiDataGrid-row--editing":
+        {
+          backgroundImage: "var(--admin-bgimg) !important",
+          backgroundColor: "var(--white-20) !important",
+          transition: "all 300ms ease-out",
+          color: "#fff !important",
+        },
+      "& .MuiDataGrid-virtualScrollerRenderZone > div.MuiDataGrid-row.MuiDataGrid-row--editing:hover":
+        {
+          backgroundColor: "var(--white-10) !important",
+        },
+      // Also fix each cell inside edit row (needed in dark themes)
+      "& .MuiDataGrid-virtualScrollerRenderZone > div.MuiDataGrid-row.MuiDataGrid-row--editing .MuiDataGrid-cell":
+        {
+          backgroundColor: "var(--white-20) !important",
+          color: "#fff !important",
+        },
+    }),
+    []
+  );
+
+  // Memoize toolbar component reference to avoid recreating slot
+  const Toolbar = React.useMemo(
+    () => (onAdd ? () => <EditToolbar onAdd={onAdd} /> : undefined),
+    [onAdd]
+  );
 
   return (
     <Box sx={{ height: 420, width: "100%" }}>
       <DataGrid
-        sx={{
-          backgroundImage: "var(--admin-bgimg)",
-          backgroundColor: "var(--admin-card-bg)",
-          borderRadius: "var(--border-radius-lg)",
-          color: "var(--admin-text-white)",
-          padding: "16px",
-          border: "none",
-          "& .MuiCheckbox-root": {
-            color: "#fff !important", // unchecked
-          },
-          "& .MuiDataGrid-main": {
-            borderTopLeftRadius: "var(--border-radius-sm)",
-            borderTopRightRadius: "var(--border-radius-sm)",
-            overflow: "hidden",
-          },
-          "& .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderTitleContainer .MuiCheckbox-root":
-            {
-              color: "#000 !important", // unchecked color
-            },
-          "& .MuiDataGrid-columnHeader .Mui-checked": {
-            color: "#1976d2 !important", // checked color
-          },
-          "& .Mui-checked": {
-            color: "var(--admin-text-white) !important", // checked
-          },
-          // Hide the blue ripple highlight
-          "& .MuiCheckbox-root:hover": {
-            backgroundColor: "rgba(255,255,255,0.1) !important",
-          },
-          // Optional: hide focus ring
-          "& .Mui-focusVisible": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-row.Mui-selected": {
-            backgroundColor: "var(--white-10)",
-          },
-          "& .MuiDataGrid-row.Mui-selected:hover": {
-            backgroundColor: "var(--white-20)",
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: "transparent",
-            cursor: "pointer",
-          },
-          "& .MuiDataGrid-columnHeader": {
-            color: "#000",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            color: "#000",
-            fontWeight: 700,
-            fontSize: "0.8rem",
-            textTransform: "uppercase",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#ffffff",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none !important", // removes bottom container border
-          },
-          "& .MuiDataGrid-footerContainer .MuiDataGrid-pagination": {
-            borderTop: "none !important",
-            color: "var(--admin-text-white)",
-          },
-          "& .MuiTablePagination-title": {
-            color: "#fff",
-          },
-
-          // Page number text
-          "& .MuiTablePagination-displayedRows": {
-            color: "#fff",
-          },
-
-          // Page size dropdown text
-          "& .MuiTablePagination-selectLabel": {
-            color: "#fff",
-          },
-
-          // Dropdown options text
-          "& .MuiTablePagination-select": {
-            color: "#fff",
-          },
-
-          // Pagination buttons (arrows)
-          "& .MuiTablePagination-actions svg": {
-            fill: "#fff",
-          },
-        }}
         apiRef={apiRef}
-        rows={rows}
-        columns={column}
+        rows={data}
+        columns={mergedColumns}
         editMode="row"
+        isCellEditable={() => false}
         rowModesModel={rowModesModel}
         onRowModesModelChange={setRowModesModel}
-        onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 5 } },
-        }}
-        pageSizeOptions={[5]}
+        onProcessRowUpdateError={(error) => console.error(error)}
+        slots={{ toolbar: Toolbar }}
         disableRowSelectionOnClick
-        checkboxSelection
-        slots={{
-          toolbar: EditToolbar,
-        }}
-        slotProps={{
-          toolbar: { setRows, setRowModesModel },
-        }}
+        initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+        pageSizeOptions={[5]}
+        sx={gridSx}
       />
     </Box>
   );
-}
+};
+
+export default React.memo(OptimizedTable);

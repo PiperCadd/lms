@@ -10,7 +10,7 @@ export default function SearchBar() {
         width: "300px",
         background: "var(--admin-body-bg)",
         padding: "8px 14px",
-        borderRadius: "12px",
+        borderRadius: "6px",
         border: "1px solid rgba(255,255,255,0.12)",
         backdropFilter: "blur(8px)",
         transition: "all 300ms ease",

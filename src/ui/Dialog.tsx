@@ -6,7 +6,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUIStore } from "@/store/admin/useUIStore";
-import Button from "./Button";
 import CustomForm, { FieldDefinition } from "@/components/common/CustomForm";
 
 interface DialogProps {

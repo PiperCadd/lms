@@ -27,6 +27,7 @@ export type FieldType =
   | "select"
   | "number"
   | "file"
+  | "date"
   | "checkbox";
 
 export type FieldOption = { label: string; value: string | number };
@@ -40,8 +41,9 @@ export type FieldDefinition = {
   min?: number;
   max?: number;
   options?: Array<string> | FieldOption[];
-  defaultValue?: any;
+  defaultValue?: string;
   helperText?: string;
+  row?: number;
 };
 
 export type ExternalLink = {
@@ -75,7 +77,7 @@ const buildZodSchema = (fields: FieldDefinition[]) => {
 
     switch (f.type) {
       case "email": {
-        let s = z.email({ message: "Invalid email address" });
+        const s = z.email({ message: "Invalid email address" });
         schema = s;
         break;
       }
@@ -391,10 +393,19 @@ export default function CustomForm({
     },
     [fields, handleApiSubmit]
   );
+
+  const rows = fields.reduce((acc, f) => {
+    if (f.row) {
+      if (!acc[f.row]) acc[f.row] = [];
+      acc[f.row].push(f);
+    }
+    return acc;
+  }, {} as Record<number, FieldDefinition[]>);
+
   return (
     <form onSubmit={handleSubmit(submitHandler)}>
       <div className="">
-        {fields.map((f) => (
+        {/* {fields.map((f) => (
           <FormField
             key={f.name}
             field={f}
@@ -402,7 +413,38 @@ export default function CustomForm({
             register={register}
             errors={errors}
           />
-        ))}
+        ))} */}
+        <div className="flex flex-col gap-4">
+          {fields.map((field) => {
+            // If field is part of a row group, skip here (we will render it later)
+            if (field.row) return null;
+
+            return (
+              <FormField
+                key={field.name}
+                field={field}
+                control={control}
+                register={register}
+                errors={errors}
+              />
+            );
+          })}
+
+          {/* Render all rows */}
+          {Object.keys(rows).map((rowKey) => (
+            <div key={rowKey} className="grid grid-cols-3 gap-4">
+              {rows[+rowKey].map((field) => (
+                <FormField
+                  key={field.name}
+                  field={field}
+                  control={control}
+                  register={register}
+                  errors={errors}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       {renderLinks("above")}
       <Button type="submit" disabled={isSubmitting} variant="contained">
@@ -413,4 +455,3 @@ export default function CustomForm({
   );
 }
 FormField.displayName = "FormField";
-

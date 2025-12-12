@@ -18,7 +18,7 @@ export default function MonthlyRevenueChart({
   ];
 
   return (
-    <div className="[background-image:var(--admin-bgimg)] bg-[var(--admin-card-bg)] rounded-2xl p-6 shadow-xl h-full">
+    <div className="[background-image:var(--admin-bgimg)] bg-[var(--admin-body-bg)] rounded-2xl p-6 shadow-xl h-full">
       <div className="text-white text-lg font-semibold mb-3">
         Monthly Revenue
       </div>

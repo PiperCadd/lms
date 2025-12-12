@@ -2,31 +2,36 @@
 import Table from "@/components/admin/Table";
 import Button from "@/ui/Button";
 import SearchBar from "@/ui/SearchBar";
-import {
-  GridColDef,
-} from "@mui/x-data-grid";
+import { GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
 import { addDesignationFormFields } from "@/config/admin";
-import { mockCourseCategories } from "@/mockData";
+import { mockLanguages } from "@/mockData";
 import CrudActions from "@/ui/CurdActions";
 
 const Page = () => {
   const { setIsDialogOpen } = useUIStore();
-    const columns: GridColDef[] = [
-      { field: "id", headerName: "SL.No", width: 100 },
-      {
-        field: "categoryName",
-        headerName: "Category Name",
-        width: 550,
-        editable: true,
-      },
-    ];
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "SL.No", width: 100 },
+    {
+      field: "code",
+      headerName: "Language Code",
+      width: 300,
+      editable: true,
+    },
+    {
+      field: "name",
+      headerName: "Language Name",
+      width: 300,
+      editable: true,
+    },
+  ];
 
   return (
     <main className="text-white p-6">
-      <h1 className="text-2xl mb-4">Categories</h1>
+      <h1 className="text-2xl mb-4">Languages</h1>
       <div className="flex justify-between mb-8">
         <SearchBar />
         <Button
@@ -40,17 +45,17 @@ const Page = () => {
           size="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
-          <span>Add Category</span>
+          <span>Add Languages</span>
         </Button>
         <Dialog
           title="Add Category"
-          supportText="Enter the new Category to proceed"
+          supportText="Enter the new designation to proceed"
           formFields={addDesignationFormFields}
           apiEndPoint="/"
         />
       </div>
-        <Table
-        rows={mockCourseCategories}
+      <Table
+        rows={mockLanguages}
         columns={columns}
         renderActions={(params, handlers) => [
           <CrudActions

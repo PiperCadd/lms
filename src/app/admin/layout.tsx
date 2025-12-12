@@ -16,6 +16,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePathname } from "next/navigation";
 
 import Drawer from "@/components/admin/Drawer";
+import { useConfirmDialogStore } from "@/hooks/admin/useConfirmDialogStore";
+import ConfirmDialog from "@/ui/ConfirmDialog";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -55,6 +57,17 @@ export default function AdminRootLayout({
 
   const handleDrawerToggle = () => setOpen((s) => !s);
   const handleDrawerClose = () => setOpen(false);
+  const {
+    openConfirmDialog,
+    title,
+    description,
+    confirmText,
+    cancelText,
+    loading,
+    isDestructive,
+    onConfirm,
+    onCancel,
+  } = useConfirmDialogStore();
 
   return (
     <ThemeProvider theme={theme}>
@@ -107,6 +120,17 @@ export default function AdminRootLayout({
                 {children}
               </Box>
             </Box>
+            <ConfirmDialog
+              open={openConfirmDialog}
+              title={title}
+              description={description}
+              confirmText={confirmText}
+              cancelText={cancelText}
+              loading={loading}
+              isDestructive={isDestructive}
+              onConfirm={onConfirm}
+              onCancel={onCancel}
+            />
           </>
         )}
       </div>

@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import { Upload } from "@mui/icons-material";
 
-
 interface FileFieldProps extends Omit<TextFieldProps, "type"> {
   onFileSelect?: (file: File | null) => void;
 }
@@ -51,6 +50,7 @@ const FileField = ({ sx, onFileSelect, ...props }: FileFieldProps) => {
       }}
       slotProps={{
         input: {
+          sx: { color: "#fff" },
           endAdornment: (
             <InputAdornment position="end">
               <IconButton component="span">
@@ -59,7 +59,7 @@ const FileField = ({ sx, onFileSelect, ...props }: FileFieldProps) => {
             </InputAdornment>
           ),
         },
-        inputLabel: {shrink: true}
+        inputLabel: { shrink: true },
       }}
     />
   );

@@ -2,13 +2,13 @@
 import Table from "@/components/admin/Table";
 import Button from "@/ui/Button";
 import SearchBar from "@/ui/SearchBar";
-import { GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
-import { addDesignationFormFields } from "@/config/admin";
+import { addLanguagesFormFields } from "@/config/admin";
 import { mockLanguages } from "@/mockData";
-import CrudActions from "@/ui/CurdActions";
+import CrudActions from "@/ui/Actions";
 
 const Page = () => {
   const { setIsDialogOpen } = useUIStore();
@@ -42,15 +42,14 @@ const Page = () => {
             gap: "4px",
           }}
           onClick={() => setIsDialogOpen(true)}
-          size="small"
+          sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Languages</span>
         </Button>
         <Dialog
-          title="Add Category"
-          supportText="Enter the new designation to proceed"
-          formFields={addDesignationFormFields}
+          title="Add Languages"
+          formFields={addLanguagesFormFields}
           apiEndPoint="/"
         />
       </div>

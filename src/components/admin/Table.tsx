@@ -175,9 +175,7 @@ const OptimizedTable: React.FC<TableProps> = ({
 
  const handleToggleClick = React.useCallback(
   (params: GridRowParams) => (event: React.MouseEvent) => {
-    
-    // ⭐ FIX: remove focus BEFORE dialog opens
-    (event.currentTarget as HTMLElement).blur();
+        (event.currentTarget as HTMLElement).blur();
 
     const id = params.id;
     const isActive = params.row.isActive;
@@ -297,7 +295,7 @@ const OptimizedTable: React.FC<TableProps> = ({
         field: "actions",
         type: "actions",
         headerName: "Actions",
-        width: 160,
+        width: 200,
         getActions,
       },
     ];

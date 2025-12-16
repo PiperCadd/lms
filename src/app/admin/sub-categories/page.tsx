@@ -10,8 +10,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
-import { addDesignationFormFields } from "@/config/admin";
-import CrudActions from "@/ui/CurdActions";
+import { addDesignationFormFields, addSubCategoryFormFields } from "@/config/admin";
+import CrudActions from "@/ui/Actions";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
@@ -66,15 +66,14 @@ const Page = () => {
             gap: "4px",
           }}
           onClick={() => setIsDialogOpen(true)}
-          size="small"
+          sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Sub Categories</span>
         </Button>
         <Dialog
-          title="Add Category"
-          supportText="Enter the new designation to proceed"
-          formFields={addDesignationFormFields}
+          title="Add Sub Category"
+          formFields={addSubCategoryFormFields}
           apiEndPoint="/"
         />
       </div>

@@ -4,64 +4,148 @@ import {
   TextFieldProps,
   InputAdornment,
   IconButton,
+  Box,
+  Typography,
 } from "@mui/material";
 import { Upload } from "@mui/icons-material";
 
 interface FileFieldProps extends Omit<TextFieldProps, "type"> {
   onFileSelect?: (file: File | null) => void;
+  previewHeight?: number;
+  existingPreviewUrl?: string;
 }
 
-const FileField = ({ sx, onFileSelect, ...props }: FileFieldProps) => {
+const FileField = ({
+  sx,
+  onChange,
+  inputRef,
+  previewHeight = 120,
+  existingPreviewUrl,
+  ...props
+}: FileFieldProps) => {
+  const [file, setFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    if (onFileSelect) onFileSelect(file);
+    const selectedFile = event.target.files?.[0] || null;
+
+    setFile(selectedFile);
+
+    if (selectedFile && selectedFile.type.startsWith("image/")) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
+    onChange?.(event);
   };
 
+  // Cleanup object URL
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   return (
-    <MuiTextField
-      {...props}
-      type="file"
-      variant="outlined"
-      size="small"
-      onChange={handleChange}
-      sx={{
-        width: "100%",
-        marginBottom: "16px",
-        "& .MuiInputLabel-root": {
-          position: "static",
-          transform: "none",
-          fontSize: "0.875rem",
-          color: "#e6ecf0",
-          marginBottom: "4px",
-        },
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            borderWidth: "1.5px",
-            borderColor: "rgba(255, 255, 255, 0.15)",
+    <div>
+      <MuiTextField
+        {...props}
+        type="file"
+        variant="outlined"
+        size="small"
+        inputRef={inputRef}
+        onChange={handleChange}
+        sx={{
+          width: "100%",
+          borderColor: "var(--border-color)",
+          /* label above input */
+          "& .MuiInputLabel-root": {
+            position: "static",
+            transform: "none",
+            fontSize: "0.875rem",
+            lineHeight: "calc(1.25 / 0.875)",
+            color: "#e6ecf0",
+            mb: "4px",
           },
-          "&:hover fieldset": {
-            borderColor: "blue",
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: "#fff",
           },
-          "&.Mui-focused fieldset": {
-            borderColor: "green",
+          /* input box */
+          "& .MuiOutlinedInput-root": {
+            mt: 0,
+            backgroundColor: "var(--admin-body-bg)",
+            "& fieldset": {
+              borderWidth: "1.5px",
+              borderColor: "var(--border-color)",
+            },
+
+            "&:hover fieldset": {
+              borderColor: "var(--border-focus-color)",
+            },
+
+            "&.Mui-focused fieldset": {
+              borderColor: "var(--border-focus-color)",
+            },
           },
-        },
-        ...sx,
-      }}
-      slotProps={{
-        input: {
-          sx: { color: "#fff" },
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton component="span">
-                <Upload />
-              </IconButton>
-            </InputAdornment>
-          ),
-        },
-        inputLabel: { shrink: true },
-      }}
-    />
+
+          "& input::file-selector-button": {
+            height: "100%",
+            backgroundColor: "var(--white-10)",
+            color: "var(--admin-text-white)",
+            borderRight: "1px solid var(--border-color)",
+            paddingX: "8px",
+            marginRight: "8px",
+            cursor: "pointer",
+          },
+          "& input::file-selector-button:hover": {
+            backgroundColor: "#c5c9cd",
+          },
+
+          ...sx,
+        }}
+        slotProps={{
+          inputLabel: { shrink: false },
+          input: {
+            sx: { color: "#fff" },
+          },
+        }}
+      />
+
+      {/* Preview Section */}
+      {(file || existingPreviewUrl) && (
+        <Box
+          sx={{
+            mt: 1,
+            p: 0.5,
+            width: "fit-content",
+            borderRadius: 1,
+            border: "1px solid rgba(255,255,255,0.2)",
+          }}
+        >
+          {previewUrl || existingPreviewUrl ? (
+            <Box
+              component="img"
+              src={previewUrl || existingPreviewUrl}
+              alt="Preview"
+              sx={{
+                height: previewHeight,
+                maxWidth: "100%",
+                borderRadius: 1,
+                objectFit: "contain",
+              }}
+            />
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{ color: "#e6ecf0", wordBreak: "break-all" }}
+            >
+              {file?.name}
+            </Typography>
+          )}
+        </Box>
+      )}
+    </div>
   );
 };
 

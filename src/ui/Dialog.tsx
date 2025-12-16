@@ -10,48 +10,55 @@ import CustomForm, { FieldDefinition } from "@/components/common/CustomForm";
 
 interface DialogProps {
   title: string;
-  supportText: string;
   formFields: FieldDefinition[];
   apiEndPoint: string;
 }
 
-export default function Dialog({ title, supportText, formFields, apiEndPoint }: DialogProps) {
+export default function Dialog({
+  title,
+  formFields,
+  apiEndPoint,
+}: DialogProps) {
   const { isDialogOpen, setIsDialogOpen } = useUIStore();
 
   return (
-    <MuiDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} sx={{
-    "& .MuiPaper-root": {
-      backgroundImage: "var(--admin-bgimg)",
+    <MuiDialog
+      open={isDialogOpen}
+      onClose={() => setIsDialogOpen(false)}
+      sx={{
+        "& .MuiPaper-root": {
+          backgroundImage: "var(--admin-bgimg)",
           backgroundColor: "var(--admin-card-bg)",
           color: "var(--admin-text-white)",
           width: "30rem",
           borderRadius: "var(--border-radius-lg)",
-    },
-  }} >
-<DialogTitle
-  sx={{
-    m: 0,
-    p: 2,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  }}
->
-  {title}
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          mb: 2.5,
+          p: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundImage: "var(--admin-bgimg-blue)",
+        }}
+      >
+        {title}
 
-  <IconButton
-    onClick={() => setIsDialogOpen(false)}
-    sx={{
-      color: "var(--admin-text-white)",
-      padding: "4px",
-      "&:hover": { opacity: 0.7 }
-    }}
-  >
-    <CloseIcon />
-  </IconButton>
-</DialogTitle>
+        <IconButton
+          onClick={() => setIsDialogOpen(false)}
+          sx={{
+            color: "var(--admin-text-white)",
+            padding: "4px",
+            "&:hover": { opacity: 0.7 },
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{color:"var(--admin-gray)", marginBottom:"20px" }}>{supportText}</DialogContentText>
         <CustomForm fields={formFields} apiEndpoint={apiEndPoint} />
       </DialogContent>
 

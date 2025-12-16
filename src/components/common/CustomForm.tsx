@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from "react";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useForm, Controller, SubmitHandler, FieldPath } from "react-hook-form";
 import { z, ZodType, ZodObject, ZodString } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/ui/Button";
@@ -14,6 +14,7 @@ import {
 import Checkbox from "@/ui/Checkbox";
 import FileField from "@/ui/FileField";
 import { useFormHandler } from "@/hooks/admin/customHooks";
+import useFormOptions from "@/hooks/admin/useFormOptions";
 import { useAppStore } from "@/store/admin/useAppStore";
 
 // -----------------------------
@@ -30,7 +31,14 @@ export type FieldType =
   | "date"
   | "checkbox";
 
-export type FieldOption = { label: string; value: string | number };
+export type PrimitiveOption = string | number;
+
+export type FieldOption =
+  | PrimitiveOption
+  | {
+      label: string;
+      value: PrimitiveOption;
+    };
 
 export type FieldDefinition = {
   name: string;
@@ -40,8 +48,9 @@ export type FieldDefinition = {
   required?: boolean;
   min?: number;
   max?: number;
-  options?: Array<string> | FieldOption[];
-  defaultValue?: string;
+  options?: FieldOption[];
+  optionsKey?: string;
+  defaultValue?: string | boolean;
   helperText?: string;
   row?: number;
 };
@@ -57,15 +66,15 @@ export type CustomFormProps<T extends ZodType = ZodType> = {
   fields: FieldDefinition[];
   buttonName?: string;
   apiEndpoint: string;
+  method?: "POST" | "PUT" | "PATCH";
   submitLabel?: string;
   className?: string;
   zodSchema?: ZodObject<any> | null; // optional override
   externalLink?: ExternalLink[] | [];
+  initialValues?: Record<string, any>; // EDIT SUPPORT
 };
 
-// -----------------------------
 // Utility: build dynamic zod schema from fields
-// -----------------------------
 const buildZodSchema = (fields: FieldDefinition[]) => {
   const shape: Record<string, ZodType> = {};
 
@@ -105,8 +114,12 @@ const buildZodSchema = (fields: FieldDefinition[]) => {
         schema = z.union([z.string(), z.number()]);
         break;
       case "file":
-        // We'll validate files minimally here; advanced validation should be in onSubmit
-        schema = z.any();
+        schema = z
+          .instanceof(File)
+          .optional()
+          .refine((f) => f instanceof File, {
+            message: "File is required",
+          });
         break;
       case "checkbox":
         schema = z.boolean();
@@ -136,44 +149,22 @@ const buildZodSchema = (fields: FieldDefinition[]) => {
   return z.object(shape);
 };
 
-// -----------------------------
-// FormField - small helper for rendering each field type
-// -----------------------------
-const currencies = [
-  {
-    value: "USD",
-    label: "$",
-  },
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
-// const FormField: React.FC<{
-//   field: FieldDefinition;
-//   control: any;
-//   register: any;
-//   errors: any;
-// }> = ({ field, control, register, errors }) => {
+// Form Fields
 const FormField = React.memo(
   ({
     field,
+    initialValues,
     control,
     register,
     errors,
+    optionsMap,
   }: {
     field: FieldDefinition;
+    initialValues: any;
     control: any;
     register: any;
     errors: any;
+    optionsMap?: FieldOption[];
   }) => {
     const name = field.name;
     const error = errors?.[name];
@@ -187,9 +178,11 @@ const FormField = React.memo(
             defaultValue={field.defaultValue ?? ""}
             render={({ field: ctrlField }) => (
               <TextField
+                id={field.name}
                 {...ctrlField}
                 type={field.type}
                 label={field.label}
+                placeholder={field.placeholder}
                 multiline={true}
                 error={!!error}
                 helperText={error?.message || field.helperText}
@@ -197,7 +190,14 @@ const FormField = React.memo(
             )}
           />
         );
-      case "select":
+      case "select": {
+        const resolvedOptions =
+          field.options ??
+          (field.optionsKey ? optionsMap?.[field.optionsKey] : []);
+
+        const hasOptions =
+          Array.isArray(resolvedOptions) && resolvedOptions.length > 0;
+
         return (
           <Controller
             name={name}
@@ -205,21 +205,39 @@ const FormField = React.memo(
             defaultValue={field.defaultValue ?? ""}
             render={({ field: ctrlField }) => (
               <TextField
+                id={field.name}
                 {...ctrlField}
                 select
                 label={field.label}
                 error={!!error}
                 helperText={error?.message || field.helperText}
+                disabled={!hasOptions}
               >
-                {currencies.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {/* ALWAYS pass children */}
+                {!hasOptions && (
+                  <MenuItem value="" disabled>
+                    Loading...
                   </MenuItem>
-                ))}
+                )}
+
+                {hasOptions &&
+                  resolvedOptions.map((option, i) => {
+                    const value =
+                      typeof option === "object" ? option.value : option;
+                    const label =
+                      typeof option === "object" ? option.label : option;
+
+                    return (
+                      <MenuItem key={i} value={value}>
+                        {label}
+                      </MenuItem>
+                    );
+                  })}
               </TextField>
             )}
           />
         );
+      }
       case "number":
         return (
           <Controller
@@ -228,9 +246,11 @@ const FormField = React.memo(
             defaultValue={field.defaultValue ?? ""}
             render={({ field: ctrlField }) => (
               <TextField
+                id={field.name}
                 {...ctrlField}
                 type={field.type}
                 label={field.label}
+                placeholder={field.placeholder}
                 error={!!error}
                 helperText={error?.message || field.helperText}
               />
@@ -242,13 +262,18 @@ const FormField = React.memo(
           <Controller
             name={name}
             control={control}
-            defaultValue={field.defaultValue ?? null}
             render={({ field: ctrlField }) => (
               <FileField
-                {...ctrlField}
+                id={field.name}
                 label={field.label}
                 error={!!error}
                 helperText={error?.message || field.helperText}
+                existingPreviewUrl={initialValues?.profileImageUrl}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file = e.currentTarget.files?.[0] ?? null;
+                  ctrlField.onChange(file);
+                }}
+                inputRef={ctrlField.ref}
               />
             )}
           />
@@ -258,12 +283,12 @@ const FormField = React.memo(
           <Controller
             name={name}
             control={control}
-            defaultValue={!!field.defaultValue}
+            defaultValue={field.defaultValue ?? false}
             render={({ field: ctrlField }) => (
               <FormControl error={!!error}>
                 <FormControlLabel
                   control={
-                    <Checkbox {...ctrlField} checked={field.defaultValue} />
+                    <Checkbox {...ctrlField} checked={ctrlField.value} />
                   }
                   label={field.label}
                 />
@@ -281,9 +306,11 @@ const FormField = React.memo(
             defaultValue={field.defaultValue ?? ""}
             render={({ field: ctrlField }) => (
               <TextField
+                id={field.name}
                 {...ctrlField}
                 type={field.type}
                 label={field.label}
+                placeholder={field.placeholder}
                 error={!!error}
                 helperText={error?.message || field.helperText}
                 sx={{ color: "black" }}
@@ -295,13 +322,16 @@ const FormField = React.memo(
   }
 );
 
+// Custom Form
 export default function CustomForm({
   fields,
   buttonName = "Submit",
+  method = "POST",
   apiEndpoint,
   externalLink,
   className = "",
   zodSchema = null,
+  initialValues,
 }: CustomFormProps) {
   const { setTost } = useAppStore();
 
@@ -333,7 +363,7 @@ export default function CustomForm({
                   onClick={() => (window.location.href = link.href)}
                   sx={{
                     background: "#181f4a",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    border: "1px solid var(--border-color)",
                   }}
                 >
                   {link.text}
@@ -353,22 +383,47 @@ export default function CustomForm({
 
   type SchemaType = z.infer<typeof schema>;
 
-  const { control, handleSubmit, register, formState } = useForm<SchemaType>({
-    resolver: zodResolver(schema as any),
-    defaultValues: useMemo(
-      () =>
-        fields.reduce(
-          (acc, f) => ({ ...acc, [f.name]: f.defaultValue ?? undefined }),
-          {} as Record<string, any>
-        ),
-      [fields]
-    ),
-  });
+  const defaultValues = useMemo(
+    () =>
+      fields.reduce(
+        (a, f) => ({ ...a, [f.name]: f.defaultValue ?? undefined }),
+        {}
+      ),
+    [fields]
+  );
+
+  const { control, handleSubmit, register, formState, setFocus, reset } =
+    useForm<SchemaType>({
+      resolver: zodResolver(schema as any),
+      defaultValues,
+    });
 
   const { errors, isSubmitting } = formState;
 
+  /* -------------------- EDIT MODE RESET -------------------- */
+  useEffect(() => {
+    if (initialValues) reset(initialValues);
+  }, [initialValues, reset]);
+
+  /* -------------------- AUTO FOCUS ERROR -------------------- */
+  useEffect(() => {
+    const firstErrorField = Object.keys(errors)[0] as
+      | FieldPath<SchemaType>
+      | undefined;
+
+    if (firstErrorField) {
+      const el = document.querySelector(
+        `[name="${firstErrorField}"]`
+      ) as HTMLElement | null;
+
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setFocus(firstErrorField); // fully typed
+    }
+  }, [errors, setFocus]);
+
   const { handleApiSubmit, loading, error, success } = useFormHandler({
     apiEndpoint,
+    method,
     onError: () => setTost(true),
   });
 
@@ -380,14 +435,12 @@ export default function CustomForm({
       const normalized = { ...data } as any;
 
       fields.forEach((f) => {
-        if (f.type === "file" && data[f.name]) {
-          // convert FileList to File or array depending on single/multiple
-          const files = (data as any)[f.name] as FileList;
-          if (files && files.length === 1) normalized[f.name] = files[0];
-          else if (files && files.length > 1)
-            normalized[f.name] = Array.from(files);
+        if (f.type === "file") {
+          // already a File
+          normalized[f.name] = data[f.name];
         }
       });
+
       console.log("📦 Normalized data being sent to parent:", normalized);
       await handleApiSubmit(normalized);
     },
@@ -402,52 +455,60 @@ export default function CustomForm({
     return acc;
   }, {} as Record<number, FieldDefinition[]>);
 
-  return (
-    <form onSubmit={handleSubmit(submitHandler)}>
-      <div className="">
-        {/* {fields.map((f) => (
-          <FormField
-            key={f.name}
-            field={f}
-            control={control}
-            register={register}
-            errors={errors}
-          />
-        ))} */}
-        <div className="flex flex-col gap-4">
-          {fields.map((field) => {
-            // If field is part of a row group, skip here (we will render it later)
-            if (field.row) return null;
+  const optionKeys = useMemo(
+    () =>
+      Array.from(
+        new Set(fields.map((f) => f.optionsKey).filter(Boolean) as string[])
+      ),
+    [fields]
+  );
 
-            return (
+  const { optionsMap } = useFormOptions(optionKeys);
+
+  return (
+    <form className="" onSubmit={handleSubmit(submitHandler)}>
+      <div className="flex flex-col gap-4">
+        {fields.map((field) => {
+          // If field is part of a row group, skip here (we will render it later)
+          if (field.row) return null;
+          return (
+            <FormField
+              key={field.name}
+              field={field}
+              initialValues={initialValues}
+              control={control}
+              register={register}
+              errors={errors}
+              optionsMap={optionsMap}
+            />
+          );
+        })}
+
+        {/* Render all rows */}
+        {Object.keys(rows).map((rowKey) => (
+          <div key={rowKey} className="grid grid-cols-3 gap-4">
+            {rows[+rowKey].map((field) => (
               <FormField
                 key={field.name}
                 field={field}
+                initialValues={initialValues}
                 control={control}
                 register={register}
                 errors={errors}
+                optionsMap={optionsMap}
               />
-            );
-          })}
-
-          {/* Render all rows */}
-          {Object.keys(rows).map((rowKey) => (
-            <div key={rowKey} className="grid grid-cols-3 gap-4">
-              {rows[+rowKey].map((field) => (
-                <FormField
-                  key={field.name}
-                  field={field}
-                  control={control}
-                  register={register}
-                  errors={errors}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ))}
       </div>
       {renderLinks("above")}
-      <Button type="submit" disabled={isSubmitting} variant="contained">
+      <Button
+        sx={{ mt: "16px", width: "fit-content", float: "right" }}
+        type="submit"
+        disabled={isSubmitting}
+        sizeVariant="medium"
+        variant="contained"
+      >
         {buttonName}
       </Button>
       {renderLinks("below")}

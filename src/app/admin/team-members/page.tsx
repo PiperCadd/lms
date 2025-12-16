@@ -1,82 +1,71 @@
 "use client";
 import Table from "@/components/admin/Table";
 import SearchBar from "@/ui/SearchBar";
-import {
-  GridColDef,
-} from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { addDesignationFormFields } from "@/config/admin";
 import { mockTeamMembers } from "@/mockData";
-import CrudActions from "@/ui/CurdActions";
+import Actions from "@/ui/Actions";
 import Link from "next/link";
+import { IconButton, Tooltip } from "@mui/material";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
+const RowLinkAction = ({ href }: { href: string }) => {
+  return (
+    <Tooltip title="Permissions">
+      <IconButton
+        component={Link}
+        href={href}
+        size="small"
+        onClick={(e) => e.stopPropagation()}
+        aria-label="View"
+        sx={{
+          backgroundColor: "#28A745",
+          color: "#fff",
+          padding: "0.45rem",
+          borderRadius: "var(--border-radius-md)",
+          transition: "0.2s",
+          "&:hover": {
+            backgroundColor: "#218838",
+          },
+        }}
+      >
+        <AdminPanelSettingsIcon fontSize="small" sx={{ color: "#fff" }} />{" "}
+        <span className="text-xs">Permissions</span>
+      </IconButton>
+    </Tooltip>
+  );
+};
 
 const Page = () => {
-    const columns: GridColDef[] = [
-      { field: "id", headerName: "SL.No", width: 100 },
-      {
-        field: "name",
-        headerName: "Name",
-        width: 200,
-        editable: true,
-      },
-      {
-        field: "email",
-        headerName: "E-Mail",
-        width: 300,
-        editable: true,
-      },
-      {
-        field: "role",
-        headerName: "Role",
-        width: 150,
-        editable: true,
-      },
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "SL.No", width: 80 },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 200,
+      editable: true,
+    },
+    {
+      field: "email",
+      headerName: "E-Mail",
+      width: 300,
+      editable: true,
+    },
+    {
+      field: "role",
+      headerName: "Role",
+      width: 150,
+      editable: true,
+    },
 
-      {
-        field: "status",
-        headerName: "Status",
-        width: 150,
-      },
-
-      // {
-      //   field: "actions",
-      //   type: "actions",
-      //   headerName: "Actions",
-      //   width: 260,
-      //   getActions: ({ id }) => {
-      //     const isEditing = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-      //     if (isEditing) {
-      //       return [
-      //         <GridActionsCellItem
-      //           key="save"
-      //           icon={<SaveIcon />}
-      //           label="Save"
-      //           onClick={handleSaveClick(id)}
-      //         />,
-      //         <GridActionsCellItem
-      //           key="cancel"
-      //           icon={<CancelIcon />}
-      //           label="Cancel"
-      //           onClick={handleCancelClick(id)}
-      //         />,
-      //       ];
-      //     }
-
-      //     return [
-      //       <CrudActions
-      //         key="delete"
-      //         edit
-      //         delete
-      //         onEdit={handleEditClick(id)}
-      //         onDelete={handleDeleteClick(id)}
-      //       />,
-      //     ];
-      //   },
-      // },
-    ];
+    {
+      field: "status",
+      headerName: "Status",
+      width: 100,
+    },
+  ];
 
   return (
     <main className="text-white p-6">
@@ -91,15 +80,14 @@ const Page = () => {
           //   gap: "4px",
           // }}
           // onClick={() => setIsDialogOpen(true)}
-          // size="small"
-          href={'/admin/team-members/add-team-member'}
+          // sizeVariant="small"
+          href={"/admin/team-members/add-team-member"}
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Team Members</span>
         </Link>
         <Dialog
           title="Add Category"
-          supportText="Enter the new designation to proceed"
           formFields={addDesignationFormFields}
           apiEndPoint="/"
         />
@@ -108,15 +96,17 @@ const Page = () => {
         rows={mockTeamMembers}
         columns={columns}
         renderActions={(params, handlers) => [
-          <CrudActions
+          <Actions
             key="crud"
             edit
             delete
-            toggle
             isActive={params.row.isActive}
             onEdit={handlers.edit}
             onDelete={handlers.delete}
-            onToggle={handlers.toggle}
+          />,
+          <RowLinkAction
+            key="view"
+            href={`/admin/team-members/permissions/${params.id}`}
           />,
         ]}
       />

@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface FormHandlerProps {
-    apiEndpoint: string;
-    onSuccess: string;
-    onError: string;
-}
+export type UseFormHandlerProps<T> = {
+  apiEndpoint: string;
+  method?: "POST" | "PUT" | "PATCH";
+  onSuccess?: (data: T) => void;
+  onError?: (error: unknown) => void;
+};
 
-export function useFormHandler({ apiEndpoint, onSuccess, onError }: FormHandlerProps) {
+export function useFormHandler<T>(props: UseFormHandlerProps<T>) {
+  const { apiEndpoint, method = "POST", onSuccess, onError } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +39,7 @@ export function useFormHandler({ apiEndpoint, onSuccess, onError }: FormHandlerP
       }
 
       const res = await fetch(apiEndpoint, {
-        method: "POST",
+        method,
         headers,
         body,
       });

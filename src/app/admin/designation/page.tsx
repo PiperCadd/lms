@@ -7,7 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
 import { addDesignationFormFields } from "@/config/admin";
-import CrudActions from "@/ui/CurdActions";
+import CrudActions from "@/ui/Actions";
 import { mockDesignations } from "@/mockData";
 import { useTableData } from "@/hooks/admin/useTableData";
 
@@ -38,14 +38,13 @@ const Page = () => {
             gap: "4px",
           }}
           onClick={() => setIsDialogOpen(true)}
-          size="small"
+          sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Designation</span>
         </Button>
         <Dialog
           title="Add Designation"
-          supportText="Enter the new designation to proceed"
           formFields={addDesignationFormFields}
           apiEndPoint="/"
         />

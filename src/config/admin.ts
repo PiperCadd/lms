@@ -82,7 +82,7 @@ export const courseManagementNavigations: NavItem[] = [
 ];
 
 export const userManagementNavigations: NavItem[] = [
-  { name: "Learners", href: "/", icon: People },
+  { name: "Learners", href: "/admin/learners", icon: People },
   { name: "Enrollments", href: "/", icon: CheckCircle },
 ];
 
@@ -104,7 +104,52 @@ export const addDesignationFormFields = [
     name: "designationName",
     label: "Designation Name",
     type: "text",
-    placeholder: "Eg: Marketing",
+    placeholder: "Enter Designation Name",
+    required: true,
+  },
+] as const satisfies FieldDefinition[];
+
+export const addLanguagesFormFields = [
+  {
+    name: "languageCode",
+    label: "Language Code",
+    type: "text",
+    placeholder: "Enter Language Code",
+    required: true,
+  },
+   {
+    name: "languageName",
+    label: "Language Name",
+    type: "text",
+    placeholder: "Enter Language Name",
+    required: true,
+  },
+] as const satisfies FieldDefinition[];
+
+export const addCategoryFormFields = [
+  {
+    name: "categoryName",
+    label: "Category Name",
+    type: "text",
+    placeholder: "Enter Category Name",
+    required: true,
+  },
+] as const satisfies FieldDefinition[];
+
+export const addSubCategoryFormFields = [
+  {
+    name: "category",
+    label: "Category",
+    type: "select",
+    optionsKey: "categories",
+    placeholder: "Choose Category",
+    required: true,
+  },
+   {
+    name: "subCategoryName",
+    label: "Sub Category Name",
+    type: "text",
+    placeholder: "Enter Sub Category Name",
     required: true,
   },
 ] as const satisfies FieldDefinition[];
@@ -114,7 +159,7 @@ export const addTeamMembers = [
     name: "name",
     label: "Name",
     type: "text",
-    placeholder: "example@user.com",
+    placeholder: "enter name",
     required: true,
     row: 1,
   },
@@ -122,7 +167,7 @@ export const addTeamMembers = [
     name: "email",
     label: "Email",
     type: "email",
-    placeholder: "example@user.com",
+    placeholder: "enter email",
     required: true,
     row: 1,
   },
@@ -130,64 +175,103 @@ export const addTeamMembers = [
     name: "phone",
     label: "Phone",
     type: "text",
-    placeholder: "example@user.com",
+    placeholder: "enter ph.no",
     required: true,
     row: 1,
   },
   {
     name: "designation",
     label: "Designation",
-    type: "text",
-    placeholder: "example@user.com",
+    type: "select",
+    optionsKey: "designations",
+    placeholder: "select designation",
     required: true,
     row: 1,
   },
   {
     name: "gender",
     label: "Gender",
-    type: "text",
-    placeholder: "example@user.com",
+    type: "select",
+    options: ["Male", "Female", "Other"],
+    placeholder: "Select Gender",
     required: true,
     row: 1,
   },
-     {
+  {
     name: "dob",
     label: "Date of Birth",
     type: "date",
-    placeholder: "example@user.com",
     required: true,
     row: 1,
   },
-     {
+  {
     name: "profileImage",
     label: "Profile Image",
     type: "file",
-    placeholder: "example@user.com",
     required: true,
     row: 1,
   },
-    {
+  {
     name: "joiningDate",
     label: "Joining Date",
     type: "date",
-    placeholder: "example@user.com",
     required: true,
     row: 1,
   },
-   {
+  {
     name: "status",
     label: "Status",
-    type: "text",
-    placeholder: "example@user.com",
+    type: "select",
+    options: ["Active", "Inactive"],
+    defaultValue: "Active",
     required: true,
     row: 1,
   },
-   {
+  {
     name: "address",
     label: "Address",
     type: "textarea",
-    placeholder: "example@user.com",
+    placeholder: "enter address",
     required: true,
     row: 1,
   },
-]as const satisfies FieldDefinition[];
+] as const satisfies FieldDefinition[];
+
+export const permissions = [
+  {
+    name: "dashboard",
+    label: "Dashboard",
+    type: "checkbox",
+    row: 1,
+  },
+  {
+    name: "employees",
+    label: "Employees",
+    type: "checkbox",
+    row: 1,
+  },
+  {
+    name: "courses",
+    label: "Courses",
+    type: "checkbox",
+    row: 1,
+  },
+  {
+    name: "lessons",
+    label: "Lessons",
+    type: "checkbox",
+    row: 1,
+  },
+  {
+    name: "reports",
+    label: "Reports",
+    type: "checkbox",
+    row: 1,
+  },
+  {
+    name: "settings",
+    label: "Settings",
+    type: "checkbox",
+    row: 1,
+  },
+] as const satisfies FieldDefinition[];

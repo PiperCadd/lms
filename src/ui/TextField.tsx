@@ -32,8 +32,7 @@ const TextField = ({
         size="small"
         sx={{
           width: "100%",
-          marginBottom: "16px",
-          borderColor: "rgba(255, 255, 255, 0.15)",
+          borderColor: "var(--border-color)",
           borderWidth: "2px",
           "& .MuiInputLabel-root": {
             position: "static",
@@ -43,14 +42,15 @@ const TextField = ({
             color: "#e6ecf0",
             marginBottom: "4px",
           },
-           "& .MuiInputLabel-root.Mui-focused": {
-      color: "#fff !important", // label when focused
-    },
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: "#fff !important", // label when focused
+          },
           "& .MuiOutlinedInput-root": {
             marginTop: 0,
+            backgroundColor: "var(--admin-body-bg)",
             "& fieldset": {
               borderWidth: "1.5px",
-              borderColor: "rgba(255, 255, 255, 0.15)", // default border
+              borderColor: "var(--border-color)",
             },
             "&:hover fieldset": {
               borderColor: "var(--border-focus-color)",
@@ -58,13 +58,21 @@ const TextField = ({
             "&.Mui-focused fieldset": {
               borderColor: "var(--border-focus-color)",
             },
+            "& input::-webkit-calendar-picker-indicator": {
+              filter: "invert(1) brightness(0.5)", // white color
+              cursor: "pointer",
+            },
+            ".MuiSelect-icon": {
+              color: "var(--white-40)",
+            },
           },
           ...sx,
         }}
         slotProps={{
-          // Add eye icon only for password fields
+          // eye icon only for password fields
           inputLabel: { shrink: false },
           input: {
+                notched: false,
             sx: { color: "#fff" }, // input text color
             endAdornment: isPassword ? (
               <InputAdornment position="end">
@@ -97,5 +105,4 @@ const TextField = ({
 
 export default TextField;
 // #d3d7dc - input bg
-// rgba(255, 255, 255, 0.15) - border
 // #e6ecf0 - heading

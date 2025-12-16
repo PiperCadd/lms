@@ -8,9 +8,9 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
-import { addDesignationFormFields } from "@/config/admin";
+import { addCategoryFormFields, addDesignationFormFields } from "@/config/admin";
 import { mockCourseCategories } from "@/mockData";
-import CrudActions from "@/ui/CurdActions";
+import CrudActions from "@/ui/Actions";
 
 const Page = () => {
   const { setIsDialogOpen } = useUIStore();
@@ -44,8 +44,7 @@ const Page = () => {
         </Button>
         <Dialog
           title="Add Category"
-          supportText="Enter the new Category to proceed"
-          formFields={addDesignationFormFields}
+          formFields={addCategoryFormFields}
           apiEndPoint="/"
         />
       </div>

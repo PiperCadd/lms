@@ -351,3 +351,36 @@ export const mockTeamMembers = [
     createdAt: "2024-02-22T15:40:00Z",
   },
 ];
+
+export const mokeUsers = [
+  {
+    id: 1,
+    name: "Lal",
+    email: "lal@gmail.com",
+    phoneNumber: "+91 98765 43210",
+  },
+  {
+    id: 2,
+    name: "Rohit Sharma",
+    email: "rohit.sharma@gmail.com",
+    phoneNumber: "+91 91234 56789",
+  },
+  {
+    id: 3,
+    name: "Sneha Iyer",
+    email: "sneha.iyer@gmail.com",
+    phoneNumber: "+91 99887 66554",
+  },
+  {
+    id: 4,
+    name: "Karthik R",
+    email: "karthik.r@gmail.com",
+    phoneNumber: "+91 90123 45678",
+  },
+  {
+    id: 5,
+    name: "Neha Patel",
+    email: "neha.patel@gmail.com",
+    phoneNumber: "+91 90909 80808",
+  },
+];

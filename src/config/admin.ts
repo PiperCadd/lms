@@ -76,14 +76,14 @@ export const quickNavigations: NavItem[] = [
 ];
 
 export const courseManagementNavigations: NavItem[] = [
-  { name: "Courses", href: "/", icon: MenuBook },
+  { name: "Courses", href: "/admin/courses", icon: MenuBook },
   { name: "Lessons", href: "/", icon: Slideshow },
   { name: "Quizzes", href: "/", icon: Quiz },
 ];
 
 export const userManagementNavigations: NavItem[] = [
   { name: "Learners", href: "/admin/learners", icon: People },
-  { name: "Enrollments", href: "/", icon: CheckCircle },
+  { name: "Enrollments", href: "/admin/enrollments", icon: CheckCircle },
 ];
 
 export const generalNavigations: NavItem[] = [
@@ -272,6 +272,33 @@ export const permissions = [
     name: "settings",
     label: "Settings",
     type: "checkbox",
+    row: 1,
+  },
+] as const satisfies FieldDefinition[];
+
+export const addCourses = [
+  {
+    name: "courseName",
+    label: "Course Name",
+    type: "text",
+    placeholder: "Enter Course Name",
+    required: true,
+    row: 1,
+  },
+  {
+    name: "courseDescription",
+    label: "Course Description",
+    type: "textarea",
+    placeholder: "Enter Course Description",
+    required: true,
+    row: 1,
+  },
+  {
+    name: "courseImage",
+    label: "Course Image",
+    type: "file",
+    placeholder: "Enter Course Description",
+    required: true,
     row: 1,
   },
 ] as const satisfies FieldDefinition[];

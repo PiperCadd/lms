@@ -20,10 +20,12 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import Button from "@mui/material/Button";
 import { useConfirmDialogStore } from "@/hooks/admin/useConfirmDialogStore";
+import Pagination from "@/ui/Pagination";
 
 interface TableProps {
   rows: GridRowsProp;
   columns: GridColDef[];
+  title?: string;
   renderActions?: (
     params: GridRowParams,
     handlers: {
@@ -58,16 +60,17 @@ function findIndexById(rows: GridRowsProp, id: GridRowId) {
   return rows.findIndex((r: any) => r.id === id);
 }
 
-const OptimizedTable: React.FC<TableProps> = ({
+const Table: React.FC<TableProps> = ({
   rows,
   columns,
+  title,
   renderActions,
   onAdd,
   onEdit,
   onSave,
   onDelete,
   onCancel,
-  onToggle
+  onToggle,
 }) => {
   const apiRef = useGridApiRef();
 
@@ -173,37 +176,37 @@ const OptimizedTable: React.FC<TableProps> = ({
     [showDialog, setLoading, closeDialog]
   );
 
- const handleToggleClick = React.useCallback(
-  (params: GridRowParams) => (event: React.MouseEvent) => {
-        (event.currentTarget as HTMLElement).blur();
+  const handleToggleClick = React.useCallback(
+    (params: GridRowParams) => (event: React.MouseEvent) => {
+      (event.currentTarget as HTMLElement).blur();
 
-    const id = params.id;
-    const isActive = params.row.isActive;
+      const id = params.id;
+      const isActive = params.row.isActive;
 
-    showDialog({
-      title: isActive ? "Deactivate Item?" : "Activate Item?",
-      description: `Do you want to ${isActive ? "deactivate" : "activate"} this item?`,
-      confirmText: isActive ? "Deactivate" : "Activate",
-      onConfirm: async () => {
-        setLoading(true);
+      showDialog({
+        title: isActive ? "Deactivate Item?" : "Activate Item?",
+        description: `Do you want to ${
+          isActive ? "deactivate" : "activate"
+        } this item?`,
+        confirmText: isActive ? "Deactivate" : "Activate",
+        onConfirm: async () => {
+          setLoading(true);
 
-        setData((prev) =>
-          prev.map((item) =>
-            item.id === id ? { ...item, isActive: !isActive } : item
-          )
-        );
+          setData((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, isActive: !isActive } : item
+            )
+          );
 
-        onToggleRef.current?.(id, !isActive);
+          onToggleRef.current?.(id, !isActive);
 
-        setLoading(false);
-        closeDialog();
-      },
-    });
-  },
-  [showDialog, closeDialog, setLoading]
-);
-
-
+          setLoading(false);
+          closeDialog();
+        },
+      });
+    },
+    [showDialog, closeDialog, setLoading]
+  );
 
   // processRowUpdate: minimal work and id-based update for performance
   const processRowUpdate = React.useCallback(
@@ -284,22 +287,24 @@ const OptimizedTable: React.FC<TableProps> = ({
       handleDeleteClick,
       handleSaveClick,
       handleCancelClick,
-      handleToggleClick
+      handleToggleClick,
     ]
   );
 
   const mergedColumns: GridColDef[] = React.useMemo(() => {
+    if (!renderActions) return columns;
+
     return [
       ...columns,
       {
         field: "actions",
         type: "actions",
         headerName: "Actions",
-        width: 200,
+        flex: 2,
         getActions,
       },
     ];
-  }, [columns, getActions]);
+  }, [columns, renderActions, getActions]);
 
   // Memoize SX to avoid creating a new object on every render
   const gridSx = React.useMemo(
@@ -308,7 +313,6 @@ const OptimizedTable: React.FC<TableProps> = ({
       backgroundColor: "var(--admin-card-bg)",
       borderRadius: "var(--border-radius-lg)",
       color: "var(--admin-text-white)",
-      padding: "16px",
       border: "none",
       "& .MuiCheckbox-root": { color: "#fff !important" },
       "& .MuiDataGrid-main": {
@@ -388,7 +392,19 @@ const OptimizedTable: React.FC<TableProps> = ({
   );
 
   return (
-    <Box sx={{ height: 420, width: "100%" }}>
+    <Box
+      sx={{
+        width: "100%",
+        height: "fit-content",
+        minWidth: 0,
+        overflow: "hidden",
+        padding: "16px",
+        backgroundImage: "var(--admin-bgimg)",
+        backgroundColor: "var(--admin-card-bg)",
+        borderRadius: "var(--border-radius-lg)",
+      }}
+    >
+      {title && <h6 className="mb-4 font-bold">{title}</h6>}
       <DataGrid
         apiRef={apiRef}
         rows={data}
@@ -399,14 +415,17 @@ const OptimizedTable: React.FC<TableProps> = ({
         onRowModesModelChange={setRowModesModel}
         processRowUpdate={processRowUpdate}
         onProcessRowUpdateError={(error) => console.error(error)}
-        slots={{ toolbar: Toolbar }}
         disableRowSelectionOnClick
         initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
         pageSizeOptions={[5]}
         sx={gridSx}
+        slots={{
+          toolbar: Toolbar,
+          pagination: Pagination,
+        }}
       />
     </Box>
   );
 };
 
-export default React.memo(OptimizedTable);
+export default React.memo(Table);

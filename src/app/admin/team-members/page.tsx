@@ -10,6 +10,7 @@ import Actions from "@/ui/Actions";
 import Link from "next/link";
 import { IconButton, Tooltip } from "@mui/material";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import Button from "@/ui/Button";
 
 const RowLinkAction = ({ href }: { href: string }) => {
   return (
@@ -27,7 +28,7 @@ const RowLinkAction = ({ href }: { href: string }) => {
           borderRadius: "var(--border-radius-md)",
           transition: "0.2s",
           "&:hover": {
-            backgroundColor: "#218838",
+            backgroundColor: "var(--admin-green)",
           },
         }}
       >
@@ -72,20 +73,10 @@ const Page = () => {
       <h1 className="text-2xl mb-4">Team Members</h1>
       <div className="flex justify-between mb-8">
         <SearchBar />
-        <Link
-          // sx={{
-          //   width: "fit-content",
-          //   fontSize: "0.8rem",
-          //   display: "flex",
-          //   gap: "4px",
-          // }}
-          // onClick={() => setIsDialogOpen(true)}
-          // sizeVariant="small"
-          href={"/admin/team-members/add-team-member"}
-        >
+        <Button LinkComponent={'a'} href="/admin/team-members/add-team-member" sx={{width: "content-width"}} >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Team Members</span>
-        </Link>
+        </Button>
         <Dialog
           title="Add Category"
           formFields={addDesignationFormFields}

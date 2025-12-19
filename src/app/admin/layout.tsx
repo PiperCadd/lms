@@ -89,10 +89,18 @@ export default function AdminRootLayout({
               />
 
               {/* Main area */}
-              <Box component="main" sx={{ flexGrow: 1, minHeight: "100vh" }}>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  minHeight: "100vh",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
                 {/* Topbar */}
                 <MuiAppBar
-                  position="sticky"
+                  position="relative"
                   sx={{
                     background: "transparent",
                     boxShadow: "none",
@@ -115,9 +123,17 @@ export default function AdminRootLayout({
                     </Avatar>
                   </MuiToolbar>
                 </MuiAppBar>
-
                 {/* Page content */}
-                {children}
+                <main
+                  className="text-white p-6"
+                  style={{
+                    flexGrow: 1,
+                    overflowX: "auto",
+                    overflowY: "auto",
+                  }}
+                >
+                  {children}
+                </main>
               </Box>
             </Box>
             <ConfirmDialog

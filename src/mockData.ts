@@ -5,7 +5,8 @@ export const mockDesignations = [
     shortName: "CEO",
     level: 1,
     department: "Executive",
-    description: "Responsible for overall strategic direction and company leadership.",
+    description:
+      "Responsible for overall strategic direction and company leadership.",
     createdAt: "2024-01-12T09:30:00Z",
   },
   {
@@ -32,7 +33,8 @@ export const mockDesignations = [
     shortName: "Jr. SE",
     level: 7,
     department: "Engineering",
-    description: "Responsible for implementing features and assisting senior developers.",
+    description:
+      "Responsible for implementing features and assisting senior developers.",
     createdAt: "2024-03-18T10:10:00Z",
   },
   {
@@ -68,31 +70,36 @@ export const mockCourseCategories = [
   {
     id: "cat-001",
     categoryName: "IT & Software",
-    description: "Covers programming, networking, cybersecurity, and software technologies.",
+    description:
+      "Covers programming, networking, cybersecurity, and software technologies.",
     createdAt: "2024-01-10T09:00:00Z",
   },
   {
     id: "cat-002",
     categoryName: "Mechanical Engineering",
-    description: "Covers mechanical systems, thermodynamics, robotics, and manufacturing.",
+    description:
+      "Covers mechanical systems, thermodynamics, robotics, and manufacturing.",
     createdAt: "2024-01-15T11:20:00Z",
   },
   {
     id: "cat-003",
     categoryName: "Electrical Engineering",
-    description: "Covers circuits, power systems, embedded systems, and electronics.",
+    description:
+      "Covers circuits, power systems, embedded systems, and electronics.",
     createdAt: "2024-01-18T08:40:00Z",
   },
   {
     id: "cat-004",
     categoryName: "Business & Management",
-    description: "Covers strategy, operations, leadership, and organizational management.",
+    description:
+      "Covers strategy, operations, leadership, and organizational management.",
     createdAt: "2024-01-22T14:10:00Z",
   },
   {
     id: "cat-005",
     categoryName: "Civil Engineering",
-    description: "Covers construction, structural analysis, design, and infrastructure.",
+    description:
+      "Covers construction, structural analysis, design, and infrastructure.",
     createdAt: "2024-01-28T10:55:00Z",
   },
 ];
@@ -384,3 +391,169 @@ export const mokeUsers = [
     phoneNumber: "+91 90909 80808",
   },
 ];
+
+export const mockCourseDetails = [
+  {
+    id: 1,
+    course: "React Fundamentals",
+    progress: 80,
+    date: "2025-01-10",
+  },
+  {
+    id: 2,
+    course: "Node.js API Development",
+    progress: 60,
+    date: "2025-01-08",
+  },
+  {
+    id: 3,
+    course: "Data Structures & Algorithms",
+    progress: 45,
+    date: "2025-01-05",
+  },
+  {
+    id: 4,
+    course: "Machine Learning Basics",
+    progress: 20,
+    date: "2025-01-03",
+  },
+  {
+    id: 5,
+    course: "UI/UX Wireframing",
+    progress: 100,
+    date: "2024-12-28",
+  },
+  {
+    id: 6,
+    course: "Database Fundamentals",
+    progress: 70,
+    date: "2024-12-20",
+  },
+];
+
+export const mockPaymentHistory = [
+  {
+    id: 1,
+    amount: 499.0,
+    status: "Paid",
+    date: "2025-01-10",
+  },
+  {
+    id: 2,
+    amount: 1299.0,
+    status: "Failed",
+    date: "2025-01-08",
+  },
+  {
+    id: 3,
+    amount: 799.0,
+    status: "Pending",
+    date: "2025-01-07",
+  },
+  {
+    id: 4,
+    amount: 1599.0,
+    status: "Paid",
+    date: "2025-01-04",
+  },
+  {
+    id: 5,
+    amount: 2499.0,
+    status: "Refunded",
+    date: "2025-01-02",
+  },
+  {
+    id: 6,
+    amount: 999.0,
+    status: "Paid",
+    date: "2024-12-30",
+  },
+];
+
+export const mockEnrollments = [
+  {
+    id: 1,
+    course: "Full-Stack Web Development",
+    userName: "Arun Kumar",
+    status: 75,
+    certificate: null,
+  },
+  {
+    id: 2,
+    course: "UI/UX Design Masterclass",
+    userName: "Priya Singh",
+    status: 100,
+    certificate: "/certificates/uiux-priya.pdf",
+  },
+  {
+    id: 3,
+    course: "Data Science & Machine Learning",
+    userName: "Rahul Sharma",
+    status: 30,
+    certificate: null,
+  },
+  {
+    id: 4,
+    course: "Python Programming",
+    userName: "Shreya Patel",
+    status: 100,
+    certificate: "/certificates/python-shreya.pdf",
+  },
+  {
+    id: 5,
+    course: "Cloud Computing (AWS)",
+    userName: "Manish Reddy",
+    status: 45,
+    certificate: null,
+  },
+  {
+    id: 6,
+    course: "Cyber Security Essentials",
+    userName: "Deepak Gupta",
+    status: 20,
+    certificate: null,
+  },
+  {
+    id: 7,
+    course: "React + Redux",
+    userName: "Sneha Roy",
+    status: 100,
+    certificate: "/certificates/react-sneha.pdf",
+  },
+  {
+    id: 8,
+    course: "DevOps Fundamentals",
+    userName: "Sanjay Verma",
+    status: 0,
+    certificate: null,
+  },
+  {
+    id: 9,
+    course: "Blockchain Developer Program",
+    userName: "Aditi Sharma",
+    status: 55,
+    certificate: null,
+  },
+  {
+    id: 10,
+    course: "Mobile App Development (Flutter)",
+    userName: "Vikram Singh",
+    status: 100,
+    certificate: "/certificates/flutter-vikram.pdf",
+  },
+];
+
+export const courseDetailsMock = 
+  {
+    id: 1,
+    courseName: "Full Stack Web Development",
+    status: "Completed",
+    officialCertificateRequired: true,
+    userName: "Ajay Prashanth",
+    certificateLink: "https://example.com/certificates/fullstack.pdf",
+    lessons: [
+      { lessonName: "HTML Basics", progress: 100, date: "2025-01-02" },
+      { lessonName: "CSS Layouts", progress: 10, date: "2025-01-03" },
+      { lessonName: "React Hooks", progress: 50, date: "2025-01-05" },
+    ],
+  };

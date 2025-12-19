@@ -18,6 +18,7 @@
   --white-30: color-mix(in oklab, var(--color-white) /* #fff = #ffffff */ 30%, transparent);
   --white-40: color-mix(in oklab, var(--color-white) /* #fff = #ffffff */ 40%, transparent);
   --white-60: color-mix(in oklab, var(--color-white) /* #fff = #ffffff */ 60%, transparent);
+  --admin-green: #218838;
   --admin-card-bg: var(--admin-body-bg);
   --border-radius-sm: 0.25rem;
   --border-radius-md: 0.375rem;

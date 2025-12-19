@@ -1,32 +1,68 @@
 "use client";
 import Table from "@/components/admin/Table";
-import Button from "@/ui/Button";
-import SearchBar from "@/ui/SearchBar";
 import { GridColDef } from "@mui/x-data-grid";
-import AddIcon from "@mui/icons-material/Add";
-import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
-import { IconButton, Tooltip } from "@mui/material";
-import { VisibilityOutlined } from "@mui/icons-material";
 import { HomeOutlined } from "@mui/icons-material";
 import Image from "next/image";
-import { mockCourseCategories, mockTeamMembers } from "@/mockData";
+import {
+  mockCourseCategories,
+  mockCourseDetails,
+  mockPaymentHistory,
+} from "@/mockData";
+import ProgressCell from "@/ui/ProgressCell";
+import Chip from "@/ui/Chip";
+import { Tooltip } from "@mui/material";
 
 const Page = () => {
   const { setIsDialogOpen } = useUIStore();
 
-  const columns: GridColDef[] = [
+  const courseDetailsColumns: GridColDef[] = [
     { field: "id", headerName: "SL.No", width: 100 },
     {
-      field: "categoryName",
-      headerName: "Name",
-      width: 300,
+      field: "course",
+      headerName: "Course",
+      flex: 1,
+      editable: true,
+    },
+    {
+      field: "progress",
+      headerName: "Progress",
+      flex: 1,
+      editable: true,
+          renderCell: (params) => <ProgressCell value={params.value} />,
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      editable: true,
+    },
+  ];
+  const paymentHistoryColumns: GridColDef[] = [
+    { field: "id", headerName: "SL.No", width: 100 },
+    {
+      field: "amount",
+      headerName: "Amount",
+      flex: 1,
+      editable: true,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      editable: true,
+      renderCell: (params)=> <Tooltip title={params.value}><Chip value={params.value} /></Tooltip>
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
       editable: true,
     },
   ];
 
   return (
-    <main className="text-white p-6">
+    <>
       <div className="flex items-end gap-2 mb-8">
         <HomeOutlined className="text-[20px]" />
         <span className="text-sm font-medium">Profile</span>
@@ -54,10 +90,10 @@ const Page = () => {
         </ul>
       </div>
       <div className="flex gap-6">
-        <Table rows={mockCourseCategories} columns={columns} />
-        <Table rows={mockCourseCategories} columns={columns} />
+        <Table rows={mockCourseDetails} columns={courseDetailsColumns} title="Course Details" />
+        <Table rows={mockPaymentHistory} columns={paymentHistoryColumns} title="Payment History" />
       </div>
-    </main>
+    </>
   );
 };
 

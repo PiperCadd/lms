@@ -3,27 +3,27 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import CustomForm from "@/components/common/CustomForm";
-import { addTeamMembers } from "@/config/admin";
+import { addLessons } from "@/config/admin";
 import { mockTeamMembers } from "@/mockData";
 
-const originalData = {
-  name: "Jefnish",
-  email: "kk@gmail.com",
-  phone: "7777777777",
-  gender: "Male",
-  dob: "2025-12-09",
-  joiningDate: "2025-12-23",
-  designation: "software_engineer",
-  address: "d",
-  status: "Active",
-  profileImage: {
-    name: "Untitled.jpg",
-    size: 317087,
-    type: "image/jpeg",
-    lastModified: 1765862125374,
-  },
-  profileImageUrl: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=400"
+export const mockAddLessonData = {
+  course: "react-fundamentals",
+  chapter: "introduction",
+  chapters: [
+    {
+      title: "What is React?",
+      description:
+        "This lesson explains what React is, why it is used, and how it helps in building user interfaces.",
+      videoFile: new File(["dummy video content"], "react-intro.mp4", {
+        type: "video/mp4",
+      }),
+      audioFile: new File(["dummy audio content"], "react-intro.mp3", {
+        type: "audio/mpeg",
+      }),
+    },
+  ],
 };
+
 
 const EditTeamPage = () => {
   const { id } = useParams();
@@ -46,15 +46,15 @@ const EditTeamPage = () => {
 
   return (
     <main className="text-white p-6">
-      <h1 className="text-2xl mb-4">Edit Team Member</h1>
+      <h1 className="text-2xl mb-4">Edit Lessons</h1>
 
-      <div className="flex justify-between mb-8 bg-[var(--admin-card-bg)] rounded-xl p-10">
+      <div className="flex justify-between mb-8 bg-(--admin-card-bg) rounded-xl p-10">
         <CustomForm
-          fields={addTeamMembers}
+          fields={addLessons}
           apiEndpoint={`/api/team/${id}`}
           method="PUT"
           buttonName="Update"
-          initialValues={initialData ?? originalData}
+          initialValues={initialData ?? mockAddLessonData}
         />
       </div>
     </main>

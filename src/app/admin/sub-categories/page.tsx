@@ -2,62 +2,70 @@
 import Table from "@/components/admin/Table";
 import Button from "@/ui/Button";
 import SearchBar from "@/ui/SearchBar";
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRowsProp,
-} from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import Dialog from "@/ui/Dialog";
 import { useUIStore } from "@/store/admin/useUIStore";
-import { addDesignationFormFields, addSubCategoryFormFields } from "@/config/admin";
+import { addSubCategoryFormFields } from "@/config/admin";
 import CrudActions from "@/ui/Actions";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-
-const initialRows: GridRowsProp = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 14 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 31 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 31 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 11 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: 28 },
-  { id: 6, lastName: "Melisandre", firstName: "Unknown", age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+import { mockSubCategories } from "@/mockData";
+import { GridFilters } from "@/components/admin/GridFilters";
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
+  const { openDialog } = useUIStore();
 
-    const columns: GridColDef[] = [
-      { field: "id", headerName: "SL.No", width: 100 },
-      {
-        field: "firstName",
-        headerName: "First name",
-        width: 150,
-        editable: true,
-      },
-      {
-        field: "lastName",
-        headerName: "Last name",
-        width: 150,
-        editable: true,
-      },
-      {
-        field: "age",
-        headerName: "Age",
-        width: 110,
-        type: "number",
-        editable: true,
-      },
-    ];
+  const columns: GridColDef[] = [
+    {
+      field: "slno",
+      headerName: "SL.NO",
+      width: 90,
+      renderCell: (params) => (params.row.showCategory ? params.value : null),
+      cellClassName: (params) =>
+        params.row.showCategory ? "group-cell" : "hidden-cell",
+    },
+    {
+      field: "category",
+      headerName: "CATEGORY",
+      flex: 1,
+      renderCell: (params) => (params.row.showCategory ? params.value : null),
+      cellClassName: (params) =>
+        params.row.showCategory ? "group-cell" : "hidden-cell",
+    },
+    {
+      field: "subcategory",
+      headerName: "SUBCATEGORY",
+      flex: 1,
+    },
+  ];
+
+  const rows = mockSubCategories.flatMap((item, index) =>
+    item.subCategory.map((sub, subIndex) => ({
+      id: `${item.id}-${subIndex}`,
+      slno: index + 1,
+      category: item.category,
+      subcategory: sub,
+      showCategory: subIndex === 0,
+    }))
+  );
 
   return (
     <main className="text-white p-6">
       <h1 className="text-2xl mb-4">Sub Categories</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
+        <div className="flex gap-2">
+          <SearchBar gridKey="subcategory" />
+          <GridFilters
+            gridKey="subcategory"
+            filters={[
+              {
+                type: "select",
+                field: "category",
+                placeholder: "Category",
+                optionsKey: "categories",
+              },
+            ]}
+          />
+        </div>
         <Button
           sx={{
             width: "fit-content",
@@ -65,21 +73,23 @@ const Page = () => {
             display: "flex",
             gap: "4px",
           }}
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => openDialog("subCategory")}
           sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Sub Categories</span>
         </Button>
         <Dialog
-          title="Add Sub Category"
+          title="Sub Category"
           formFields={addSubCategoryFormFields}
           apiEndPoint="/"
         />
       </div>
-        <Table
-        rows={initialRows}
+      <Table
+        rows={rows}
         columns={columns}
+        gridKey="subcategory"
+        onEdit={(id) => openDialog("category", id)}
         renderActions={(params, handlers) => [
           <CrudActions
             key="crud"

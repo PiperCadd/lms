@@ -9,11 +9,10 @@ import { useUIStore } from "@/store/admin/useUIStore";
 import { addDesignationFormFields } from "@/config/admin";
 import CrudActions from "@/ui/Actions";
 import { mockDesignations } from "@/mockData";
-import { useTableData } from "@/hooks/admin/useTableData";
+
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
-  const { rows, deleteRow, editRow } = useTableData(mockDesignations);
+  const { openDialog } = useUIStore();
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "SL.No", flex: 1 },
@@ -21,7 +20,6 @@ const Page = () => {
       field: "designationName",
       headerName: "Designation name",
       flex: 3,
-      editable: true,
     },
   ];
 
@@ -29,7 +27,7 @@ const Page = () => {
     <main className="text-white p-6">
       <h1 className="text-2xl mb-4">Designation</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
+        <SearchBar gridKey="designation" />
         <Button
           sx={{
             width: "fit-content",
@@ -37,21 +35,23 @@ const Page = () => {
             display: "flex",
             gap: "4px",
           }}
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => openDialog("designation")}
           sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Designation</span>
         </Button>
         <Dialog
-          title="Add Designation"
+          title="Designation"
           formFields={addDesignationFormFields}
           apiEndPoint="/"
         />
       </div>
       <Table
-        rows={rows}
+        rows={mockDesignations}
         columns={columns}
+        gridKey="designation"
+        onEdit={(id) => openDialog("designation", id)}
         renderActions={(params, handlers) => [
           <CrudActions
             key="crud"

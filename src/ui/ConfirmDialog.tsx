@@ -8,8 +8,9 @@ import {
   Button,
   IconButton,
   CircularProgress,
+  Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { CheckCircleOutline, ErrorOutline, Close } from "@mui/icons-material";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -41,50 +42,68 @@ export default function ConfirmDialog({
       maxWidth="xs"
       fullWidth
     >
-      <DialogTitle sx={{ m: 0, p: 2 }}>
-        {title}
-
-        {/* Close Icon */}
-        {!loading && (
-          <IconButton
-            aria-label="close"
-            onClick={onCancel}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        )}
-      </DialogTitle>
-
-      <DialogContent sx={{ pt: 1 }}>
-        <DialogContentText>{description}</DialogContentText>
-      </DialogContent>
-
-      <DialogActions sx={{ p: 2 }}>
-        <Button
+      {/* Close Icon */}
+      {!loading && (
+        <IconButton
+          aria-label="close"
           onClick={onCancel}
-          color="inherit"
-          disabled={loading}
-          sx={{ textTransform: "none" }}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+          }}
         >
-          {cancelText}
-        </Button>
+          <Close />
+        </IconButton>
+      )}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          justifyItems: "center",
+          alignItems: "center",
+          p: 4,
+        }}
+      >
+        {isDestructive ? (
+          <ErrorOutline
+            sx={{ fontSize: "50px", color: "var(--admin-orange)" }}
+          />
+        ) : (
+          <CheckCircleOutline
+            sx={{ fontSize: "50px", color: "var(--admin-green)" }}
+          />
+        )}
 
-        <Button
-          onClick={onConfirm}
-          variant="contained"
-          color={isDestructive ? "error" : "primary"}
-          autoFocus
-          disabled={loading}
-          sx={{ minWidth: 90, textTransform: "none" }}
-        >
-          {loading ? <CircularProgress size={20} /> : confirmText}
-        </Button>
-      </DialogActions>
+        <DialogTitle sx={{ m: 0, pt: 1, pb: 0 }}>{title}</DialogTitle>
+
+        <DialogContent sx={{ p: 0 }}>
+          <DialogContentText>{description}</DialogContentText>
+        </DialogContent>
+
+        <DialogActions sx={{ pt: 2.5 }}>
+          <Button
+            onClick={onCancel}
+            color="inherit"
+            disabled={loading}
+            sx={{ textTransform: "none" }}
+          >
+            {cancelText}
+          </Button>
+
+          <Button
+            onClick={onConfirm}
+            variant="contained"
+            color={isDestructive ? "error" : "primary"}
+            autoFocus
+            disabled={loading}
+            sx={{ minWidth: 90, textTransform: "none" }}
+          >
+            {loading ? <CircularProgress size={20} /> : confirmText}
+          </Button>
+        </DialogActions>
+      </Box>
     </Dialog>
   );
 }

@@ -3,13 +3,11 @@ import Table from "@/components/admin/Table";
 import Button from "@/ui/Button";
 import SearchBar from "@/ui/SearchBar";
 import { GridColDef } from "@mui/x-data-grid";
-import Dialog from "@/ui/Dialog";
-import { useUIStore } from "@/store/admin/useUIStore";
-import { addLanguagesFormFields } from "@/config/admin";
 import { mokeUsers } from "@/mockData";
 import { IconButton, Tooltip } from "@mui/material";
 import { VisibilityOutlined, ExitToAppOutlined } from "@mui/icons-material";
 import Link from "next/link";
+import { exportToCSV } from "@/utils/exportToCSV";
 
 const RowLinkAction = ({ href }: { href: string }) => {
   return (
@@ -38,8 +36,6 @@ const RowLinkAction = ({ href }: { href: string }) => {
 };
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
-
   const columns: GridColDef[] = [
     { field: "id", headerName: "SL.No", width: 60 },
     {
@@ -66,7 +62,7 @@ const Page = () => {
     <main className="text-white p-6 flex-1">
       <h1 className="text-2xl mb-4">Learners</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
+        <SearchBar gridKey="learners" />
         <Button
           sizeVariant="small"
           sx={{
@@ -77,25 +73,18 @@ const Page = () => {
             display: "flex",
             gap: "4px",
           }}
+          onClick={() => exportToCSV(mokeUsers, "users.csv")}
         >
           <ExitToAppOutlined sx={{ fontSize: "1.2rem" }} />
           <span>Export</span>{" "}
         </Button>
-
-        <Dialog
-          title="Add Languages"
-          formFields={addLanguagesFormFields}
-          apiEndPoint="/"
-        />
       </div>
       <Table
         rows={mokeUsers}
         columns={columns}
+        gridKey="learners"
         renderActions={(params) => [
-          <RowLinkAction
-            key="view"
-            href={`/admin/learners/${params.id}`}
-          />,
+          <RowLinkAction key="view" href={`/admin/learners/${params.id}`} />,
         ]}
       />
     </main>

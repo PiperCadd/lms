@@ -22,7 +22,7 @@ export default function SalesAndViewsCard({
   const leftSeries = mode === "month" ? [monthlyPercent] : [yearlyPercent];
 
   return (
-    <div className="[background-image:var(--admin-bgimg)] bg-[var(--admin-card-bg)] rounded-2xl p-5 md:p-6 shadow-xl h-fit overflow-hidden">
+    <div className="[background-image:var(--admin-bgimg)] bg-(--admin-card-bg) rounded-2xl p-5 md:p-6 shadow-xl h-fit overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -30,52 +30,43 @@ export default function SalesAndViewsCard({
           <div className="text-sm text-gray-400">Overview</div>
         </div>
         <div className="flex gap-2">
-          <Dropdown options={["a", "b", "c"]} />
-          <Dropdown options={["a", "b", "c"]} />
+          <Dropdown
+            placeholder="Month"
+            options={["January", "February", "March"]}
+          />
+          <Dropdown placeholder="Year" options={["2000", "2001", "2002"]} />
         </div>
-        {/* <select
-        title='x'
-          value={mode}
-          onChange={(e) => setMode(e.target.value as 'month' | 'year')}
-          className="bg-transparent border border-gray-700 text-gray-200 text-sm rounded px-3 py-1"
-        >
-          <option value="month">Month</option>
-          <option value="year">Year</option>
-        </select> */}
       </div>
 
       {/* Content box */}
-      <div className="mt-5 rounded-xl bg-[#0b1326] p-4">
-        <div className="flex flex-nowrap gap-4 justify-between items-center w-full">
+      <div className="mt-5 rounded-xl border border-(--border-color) p-4">
+        <div className="grid grid-cols-2 divide-x divide-(--border-color)">
           {/* LEFT block */}
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 overflow-hidden px-3">
             <div className="w-20 md:w-28 shrink-0">
               <UnifiedChart
                 type="radial"
                 series={leftSeries}
                 height={100}
-                primaryColor={mode === "month" ? "#47A3FF" : "#FFD54F"}
-                secondaryColor="#0b1220"
+                primaryColor={"#47A3FF"}
+                secondaryColor="oklch(37.2% 0.044 257.287)"
               />
             </div>
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="text-sm text-gray-300">
                 {mode === "month" ? "Monthly" : "Yearly"}
               </div>
 
               <div className="text-2xl font-semibold text-white truncate">
-                {(mode === "month"
-                  ? monthly.sales
-                  : yearly.sales
-                ).toLocaleString()}
+                {monthly.sales.toLocaleString()}
               </div>
 
-              <div className="text-sm mt-1 whitespace-nowrap">
-                <span className="text-green-400 font-semibold">
+              <div className="text-sm mt-1 flex flex-wrap gap-x-2">
+                <span className="text-green-400 font-semibold whitespace-nowrap">
                   {selected.changePercent}%
                 </span>
-                <span className="text-gray-400 ml-2">
+                <span className="text-gray-400 truncate">
                   {selected.amountUsd.toFixed(2)} USD
                 </span>
               </div>
@@ -83,8 +74,8 @@ export default function SalesAndViewsCard({
           </div>
 
           {/* RIGHT block */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-20 md:w-28 flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0 overflow-hidden px-3">
+            <div className="w-20 md:w-28 shrink-0">
               <UnifiedChart
                 type="radial"
                 series={[yearlyPercent]}

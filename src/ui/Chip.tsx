@@ -12,6 +12,7 @@ const Chip: React.FC<StatusCellProps> = ({ value }) => {
   const getColor = () => {
     switch (status) {
       case "Paid":
+      case "Success":
       case "Completed":
         return "var(--admin-green)";
       case "Pending":

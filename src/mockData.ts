@@ -104,92 +104,50 @@ export const mockCourseCategories = [
   },
 ];
 
-export const mockCourseSubCategories = [
-  // IT & Software (cat-001)
+export const mockSubCategories = [
   {
-    id: "sub-001",
-    categoryId: "cat-001",
-    name: "Web Development",
-    description: "Frontend, backend, and full-stack web technologies.",
-    createdAt: "2024-02-01T09:00:00Z",
+    id: 1,
+    category: "IT & Software",
+    subCategory: ["Web Development", "Mobile Development", "Data Science"],
   },
   {
-    id: "sub-002",
-    categoryId: "cat-001",
-    name: "Data Science",
-    description: "Machine learning, AI, statistics, and analytics.",
-    createdAt: "2024-02-03T10:30:00Z",
+    id: 2,
+    category: "Mechanical Engineering",
+    subCategory: [
+      "Automobile Engineering",
+      "Thermodynamics",
+      "Robotics",
+      "CAD/CAM",
+      "Manufacturing Tech",
+    ],
   },
   {
-    id: "sub-003",
-    categoryId: "cat-001",
-    name: "Cybersecurity",
-    description: "Ethical hacking, network security, and threat analysis.",
-    createdAt: "2024-02-05T12:00:00Z",
-  },
-
-  // Mechanical Engineering (cat-002)
-  {
-    id: "sub-004",
-    categoryId: "cat-002",
-    name: "Thermodynamics",
-    description: "Heat, energy, and power system engineering.",
-    createdAt: "2024-02-10T11:00:00Z",
+    id: 4,
+    category: "Business & Management",
+    subCategory: [
+      "Project Management",
+      "Entrepreneurship",
+      "Finance",
+      "Accounting",
+      "Leadership",
+      "Marketing",
+    ],
   },
   {
-    id: "sub-005",
-    categoryId: "cat-002",
-    name: "Robotics",
-    description: "Design and automation of robotic systems.",
-    createdAt: "2024-02-11T09:20:00Z",
-  },
-
-  // Electrical Engineering (cat-003)
-  {
-    id: "sub-006",
-    categoryId: "cat-003",
-    name: "Embedded Systems",
-    description: "Microcontrollers, IoT devices, and firmware development.",
-    createdAt: "2024-02-15T13:30:00Z",
+    id: 5,
+    category: "Design",
+    subCategory: [
+      "UI/UX Design",
+      "Graphic Design",
+      "Interior Design",
+      "Animation",
+      "Game Design",
+    ],
   },
   {
-    id: "sub-007",
-    categoryId: "cat-003",
-    name: "Power Systems",
-    description: "Electrical grids, transmission, and power distribution.",
-    createdAt: "2024-02-17T15:00:00Z",
-  },
-
-  // Business & Management (cat-004)
-  {
-    id: "sub-008",
-    categoryId: "cat-004",
-    name: "Leadership",
-    description: "People management and organizational leadership.",
-    createdAt: "2024-02-20T08:40:00Z",
-  },
-  {
-    id: "sub-009",
-    categoryId: "cat-004",
-    name: "Marketing",
-    description: "Branding, digital marketing, and market analysis.",
-    createdAt: "2024-02-21T10:10:00Z",
-  },
-
-  // Civil Engineering (cat-005)
-  {
-    id: "sub-010",
-    categoryId: "cat-005",
-    name: "Structural Engineering",
-    description: "Design and analysis of structures and frameworks.",
-    createdAt: "2024-02-25T12:50:00Z",
-  },
-  {
-    id: "sub-011",
-    categoryId: "cat-005",
-    name: "Construction Management",
-    description: "Project planning and site supervision.",
-    createdAt: "2024-02-26T14:10:00Z",
+    id: 6,
+    category: "Languages",
+    subCategory: ["English", "Spanish", "German", "French", "Mandarin Chinese"],
   },
 ];
 
@@ -281,83 +239,94 @@ export const mockTeamMembers = [
     id: "tm-001",
     name: "Aarav Sharma",
     email: "aarav.sharma@example.com",
+    phone: "+91-9876543210",
+    gender: "Male",
+    dob: "1995-04-18",
+    joiningDate: "2022-06-01",
     role: "Admin",
-    status: "active",
-    createdAt: "2024-02-01T09:30:00Z",
+    designation: "Tech Lead",
+    status: "Active",
+    createdAt: "2022-06-01T09:30:00Z",
+    address: "Bangalore, Karnataka, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=11",
   },
   {
     id: "tm-002",
     name: "Neha Verma",
     email: "neha.verma@example.com",
-    role: "Manager",
-    status: "active",
-    createdAt: "2024-02-03T11:10:00Z",
+    phone: "+91-9123456789",
+    gender: "Female",
+    dob: "1998-09-05",
+    joiningDate: "2023-01-15",
+    role: "User",
+    designation: "Software Engineer",
+    status: "Active",
+    createdAt: "2023-01-15T10:00:00Z",
+    address: "Pune, Maharashtra, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=32",
   },
   {
     id: "tm-003",
-    name: "Rohit Kumar",
-    email: "rohit.kumar@example.com",
-    role: "Instructor",
-    status: "inactive",
-    createdAt: "2024-02-05T14:00:00Z",
+    name: "Rohit Mehta",
+    email: "rohit.mehta@example.com",
+    phone: "+91-9988776655",
+    gender: "Male",
+    dob: "1993-12-22",
+    joiningDate: "2021-08-10",
+    role: "Manager",
+    designation: "Product Manager",
+    status: "Inactive",
+    createdAt: "2021-08-10T08:45:00Z",
+    address: "Delhi, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=54",
   },
   {
     id: "tm-004",
-    name: "Priya Iyer",
-    email: "priya.iyer@example.com",
-    role: "Support",
-    status: "active",
-    createdAt: "2024-02-07T10:20:00Z",
+    name: "Sneha Iyer",
+    email: "sneha.iyer@example.com",
+    phone: "+91-9012345678",
+    gender: "Female",
+    dob: "1996-02-14",
+    joiningDate: "2024-03-05",
+    role: "User",
+    designation: "UI/UX Designer",
+    status: "Pending",
+    createdAt: "2024-03-05T11:20:00Z",
+    address: "Chennai, Tamil Nadu, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=47",
   },
   {
     id: "tm-005",
-    name: "Samuel Mathew",
-    email: "samuel.mathew@example.com",
-    role: "Instructor",
-    status: "suspended",
-    createdAt: "2024-02-09T08:45:00Z",
+    name: "Kunal Patel",
+    email: "kunal.patel@example.com",
+    phone: "+91-9090909090",
+    gender: "Male",
+    dob: "1992-07-30",
+    joiningDate: "2020-11-02",
+    role: "User",
+    designation: "Senior Developer",
+    status: "Active",
+    createdAt: "2020-11-02T09:00:00Z",
+    address: "Ahmedabad, Gujarat, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=61",
   },
   {
     id: "tm-006",
-    name: "Aditi Rao",
-    email: "aditi.rao@example.com",
-    role: "Content Creator",
-    status: "active",
-    createdAt: "2024-02-12T12:30:00Z",
-  },
-  {
-    id: "tm-007",
-    name: "Vikram Das",
-    email: "vikram.das@example.com",
+    name: "Priya Nair",
+    email: "priya.nair@example.com",
+    phone: "+91-9345678123",
+    gender: "Female",
+    dob: "1994-03-11",
+    joiningDate: "2019-05-20",
     role: "Manager",
-    status: "inactive",
-    createdAt: "2024-02-15T16:10:00Z",
-  },
-  {
-    id: "tm-008",
-    name: "Meera Pillai",
-    email: "meera.pillai@example.com",
-    role: "Admin",
-    status: "active",
-    createdAt: "2024-02-18T09:55:00Z",
-  },
-  {
-    id: "tm-009",
-    name: "John Fernandes",
-    email: "john.fernandes@example.com",
-    role: "Support",
-    status: "active",
-    createdAt: "2024-02-20T13:00:00Z",
-  },
-  {
-    id: "tm-010",
-    name: "Ananya Singh",
-    email: "ananya.singh@example.com",
-    role: "Instructor",
-    status: "inactive",
-    createdAt: "2024-02-22T15:40:00Z",
+    designation: "Project Manager",
+    status: "Active",
+    createdAt: "2019-05-20T08:30:00Z",
+    address: "Kochi, Kerala, India",
+    profileImageUrl: "https://i.pravatar.cc/150?img=25",
   },
 ];
+
 
 export const mokeUsers = [
   {
@@ -543,17 +512,381 @@ export const mockEnrollments = [
   },
 ];
 
-export const courseDetailsMock = 
+export const courseDetailsMock = {
+  id: 1,
+  courseName: "Full Stack Web Development",
+  status: "Completed",
+  officialCertificateRequired: true,
+  userName: "Ajay Prashanth",
+  certificateLink: "https://example.com/certificates/fullstack.pdf",
+  lessons: [
+    { lessonName: "HTML Basics", progress: 100, date: "2025-01-02" },
+    { lessonName: "CSS Layouts", progress: 10, date: "2025-01-03" },
+    { lessonName: "React Hooks", progress: 50, date: "2025-01-05" },
+  ],
+};
+
+export const mockCourses = [
   {
     id: 1,
     courseName: "Full Stack Web Development",
-    status: "Completed",
-    officialCertificateRequired: true,
-    userName: "Ajay Prashanth",
-    certificateLink: "https://example.com/certificates/fullstack.pdf",
-    lessons: [
-      { lessonName: "HTML Basics", progress: 100, date: "2025-01-02" },
-      { lessonName: "CSS Layouts", progress: 10, date: "2025-01-03" },
-      { lessonName: "React Hooks", progress: 50, date: "2025-01-05" },
-    ],
-  };
+    category: "IT & Software",
+    subCategory: "Web Development",
+    image:
+      "https://toppng.com/uploads/preview/react-logo-icon-11609374122d9vkbptqap.png",
+    numberOfChapters: 18,
+  },
+  {
+    id: 2,
+    courseName: "Python for Data Science",
+    category: "IT & Software",
+    subCategory: "Data Science",
+    image:
+      "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+    numberOfChapters: 24,
+  },
+  {
+    id: 3,
+    courseName: "Machine Design",
+    category: "Mechanical",
+    subCategory: "Machine Engineering",
+    image:
+      "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+    numberOfChapters: 12,
+  },
+  {
+    id: 4,
+    courseName: "Introduction to CAD",
+    category: "Mechanical",
+    subCategory: "CAD Modeling",
+    image:
+      "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+    numberOfChapters: 15,
+  },
+  {
+    id: 5,
+    courseName: "UI/UX Design Fundamentals",
+    category: "Design",
+    subCategory: "UI/UX",
+    image:
+      "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+    numberOfChapters: 20,
+  },
+];
+
+export const mockLessons = [
+  {
+    id: 1,
+    lessonName: "Introduction to Web Development",
+    course: "IT and Software",
+    availableLanguages: ["English", "Spanish", "French"],
+  },
+  {
+    id: 2,
+    lessonName: "Advanced JavaScript",
+    course: "IT and Software",
+    availableLanguages: ["English", "German"],
+  },
+  {
+    id: 3,
+    lessonName: "Data Science Basics",
+    course: "IT and Software",
+    availableLanguages: ["English", "Spanish"],
+  },
+  {
+    id: 4,
+    lessonName: "Mechanical Engineering Fundamentals",
+    course: "Mechanical",
+    availableLanguages: ["English"],
+  },
+  {
+    id: 5,
+    lessonName: "Thermodynamics",
+    course: "Mechanical",
+    availableLanguages: ["English", "French"],
+  },
+  {
+    id: 6,
+    lessonName: "Web Development with React",
+    course: "IT and Software",
+    availableLanguages: ["English", "Hindi", "Spanish"],
+  },
+  {
+    id: 7,
+    lessonName: "Database Management",
+    course: "IT and Software",
+    availableLanguages: ["English"],
+  },
+  {
+    id: 8,
+    lessonName: "Fluid Mechanics",
+    course: "Mechanical",
+    availableLanguages: ["English", "German"],
+  },
+];
+
+
+export const quizzesMockData = [
+  {
+    id: 1,
+    quizTitle: "JavaScript Basics Quiz",
+    course: "Web Development",
+    noOfQuestions: 10,
+  },
+  {
+    id: 2,
+    quizTitle: "Advanced React Concepts",
+    course: "Frontend Development",
+    noOfQuestions: 15,
+  },
+  {
+    id: 3,
+    quizTitle: "Python Fundamentals Test",
+    course: "Data Science",
+    noOfQuestions: 12,
+  },
+  {
+    id: 4,
+    quizTitle: "SQL & Database Design",
+    course: "Backend Development",
+    noOfQuestions: 20,
+  },
+  {
+    id: 5,
+    quizTitle: "Machine Learning Introduction",
+    course: "Artificial Intelligence",
+    noOfQuestions: 18,
+  },
+  {
+    id: 6,
+    quizTitle: "DevOps Basics Assessment",
+    course: "Cloud & DevOps",
+    noOfQuestions: 14,
+  },
+];
+
+export const mockBanners = [
+  {
+    id: 1,
+    bannerName: "React Course Promotion",
+    type: "homepage",
+    image: "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+  },
+  {
+    id: 2,
+    bannerName: "JavaScript Mastery",
+    type: "course",
+    image: "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+  },
+  {
+    id: 3,
+    bannerName: "New UI/UX Batch",
+    type: "homepage",
+    image: "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+  },
+  {
+    id: 4,
+    bannerName: "Backend with FastAPI",
+    type: "course",
+    image: "https://www.vhv.rs/dpng/d/521-5216236_python-programming-language-logo-hd-png-download.png",
+  },
+];
+
+export const mockAnnouncements = [
+  {
+    id: 1,
+    title: "New React Course Launched",
+    content: "We are excited to announce the launch of our new React Fundamentals course. Enroll now to get early access benefits.",
+    fromDate: "2025-01-01",
+    toDate: "2025-01-31",
+  },
+  {
+    id: 2,
+    title: "Platform Maintenance",
+    content: "The platform will undergo scheduled maintenance on Sunday from 12:00 AM to 4:00 AM. Please plan accordingly.",
+    fromDate: "2025-02-05",
+    toDate: "2025-02-06",
+  },
+  {
+    id: 3,
+    title: "New Batch Enrollment Open",
+    content: "Enrollment for the March batch is now open. Limited seats available. Register early to secure your spot.",
+    fromDate: "2025-02-10",
+    toDate: "2025-03-10",
+  },
+  {
+    id: 4,
+    title: "Holiday Notice",
+    content: "Our offices will remain closed on account of the public holiday. Support services will resume the next working day.",
+    fromDate: "2025-03-29",
+    toDate: "2025-03-29",
+  },
+];
+
+
+export const couponMockData = [
+  {
+    id: 1,
+    couponName: "New User Discount",
+    couponCode: "WELCOME10",
+    type: "Percentage",
+  },
+  {
+    id: 2,
+    couponName: "Festive Offer",
+    couponCode: "FESTIVE25",
+    type: "Percentage",
+  },
+  {
+    id: 3,
+    couponName: "Flat ₹500 Off",
+    couponCode: "FLAT500",
+    type: "Flat",
+  },
+  {
+    id: 4,
+    couponName: "Summer Sale",
+    couponCode: "SUMMER15",
+    type: "Percentage",
+  },
+  {
+    id: 5,
+    couponName: "Clearance Deal",
+    couponCode: "CLEAR300",
+    type: "Flat",
+  },
+];
+
+export const faqMockData = [
+  {
+    id: 1,
+    question: "How do I apply a coupon code?",
+    answer:
+      "You can apply a coupon code at checkout by entering it in the 'Coupon Code' field and clicking Apply.",
+  },
+  {
+    id: 2,
+    question: "Can I use more than one coupon at a time?",
+    answer:
+      "No, only one coupon can be applied per order. Multiple coupons cannot be combined.",
+  },
+  {
+    id: 3,
+    question: "Why is my coupon code not working?",
+    answer:
+      "The coupon may have expired, reached its usage limit, or may not be applicable to the selected products.",
+  },
+  {
+    id: 4,
+    question: "Do coupons work on discounted items?",
+    answer:
+      "Some coupons cannot be used on already discounted items. Please check the coupon terms and conditions.",
+  },
+  {
+    id: 5,
+    question: "Can I use a coupon after placing an order?",
+    answer:
+      "Coupons must be applied before completing the checkout. They cannot be added after an order is placed.",
+  },
+];
+
+export const mockPages = [
+  {
+    id: 1,
+    pageName: "Home",
+    content: "Welcome to our website. Explore our features and latest updates."
+  },
+  {
+    id: 2,
+    pageName: "About Us",
+    content: "We are a team dedicated to building high-quality web applications."
+  },
+  {
+    id: 3,
+    pageName: "Services",
+    content: "We offer web development, UI/UX design, and backend solutions."
+  },
+  {
+    id: 4,
+    pageName: "Contact",
+    content: "Reach out to us via email or phone for any inquiries."
+  }
+];
+
+
+export const feedbackMockData = [
+  {
+    id: 1,
+    name: "Arjun Kumar",
+    feedbackContent: "The billing system is very smooth and easy to use. Reports are clear and accurate.",
+    rating: 5,
+  },
+  {
+    id: 2,
+    name: "Priya Sharma",
+    feedbackContent: "Overall good experience, but loading time can be improved on slower networks.",
+    rating: 4,
+  },
+  {
+    id: 3,
+    name: "Rahul Verma",
+    feedbackContent: "UI is clean, but I faced issues while exporting invoices to PDF.",
+    rating: 3,
+  },
+  {
+    id: 4,
+    name: "Sneha Patel",
+    feedbackContent: "Customer support was responsive and helpful. The app works reliably.",
+    rating: 5,
+  },
+  {
+    id: 5,
+    name: "Amit Singh",
+    feedbackContent: "Basic features are good, but I would like more customization options.",
+    rating: 3,
+  },
+];
+
+export const payment_report = [
+  {
+    id: 1,
+    paymentId: "PAY-1001",
+    amount: "₹1,499.00",
+    user: "Rahul Sharma",
+    status: "Success",
+    paidAt: "01 Jan 2025, 10:15 AM",
+  },
+  {
+    id: 2,
+    paymentId: "PAY-1002",
+    amount: "₹2,999.50",
+    user: "Anita Verma",
+    status: "Pending",
+    paidAt: "02 Jan 2025, 02:42 PM",
+  },
+  {
+    id: 3,
+    paymentId: "PAY-1003",
+    amount: "₹799.99",
+    user: "Mohammed Ali",
+    status: "Failed",
+    paidAt: "03 Jan 2025, 09:05 AM",
+  },
+  {
+    id: 4,
+    paymentId: "PAY-1004",
+    amount: "₹4,999.00",
+    user: "Sneha Patel",
+    status: "Success",
+    paidAt: "04 Jan 2025, 06:21 PM",
+  },
+  {
+    id: 5,
+    paymentId: "PAY-1005",
+    amount: "₹1,200.00",
+    user: "Arjun Kumar",
+    status: "Success",
+    paidAt: "05 Jan 2025, 11:30 AM",
+  },
+];
+

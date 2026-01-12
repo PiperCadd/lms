@@ -1,8 +1,6 @@
 import * as React from "react";
 import { IconButton, Dialog as MuiDialog } from "@mui/material";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUIStore } from "@/store/admin/useUIStore";
@@ -12,19 +10,27 @@ interface DialogProps {
   title: string;
   formFields: FieldDefinition[];
   apiEndPoint: string;
+  initialValues?: Record<string, any>; // EDIT SUPPORT
 }
 
 export default function Dialog({
   title,
   formFields,
   apiEndPoint,
+  initialValues,
 }: DialogProps) {
-  const { isDialogOpen, setIsDialogOpen } = useUIStore();
+  const { isDialogOpen, closeDialog, editingId, mode } = useUIStore();
+
+  const dialogTitleMap = {
+    add: `Add ${title}`,
+    edit: `Edit ${title}`,
+    view: `View ${title}`,
+  };
 
   return (
     <MuiDialog
       open={isDialogOpen}
-      onClose={() => setIsDialogOpen(false)}
+      onClose={() => closeDialog()}
       sx={{
         "& .MuiPaper-root": {
           backgroundImage: "var(--admin-bgimg)",
@@ -45,10 +51,10 @@ export default function Dialog({
           backgroundImage: "var(--admin-bgimg-blue)",
         }}
       >
-        {title}
+        {dialogTitleMap[mode]}
 
         <IconButton
-          onClick={() => setIsDialogOpen(false)}
+          onClick={() => closeDialog()}
           sx={{
             color: "var(--admin-text-white)",
             padding: "4px",
@@ -59,7 +65,12 @@ export default function Dialog({
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CustomForm fields={formFields} apiEndpoint={apiEndPoint} />
+        <CustomForm
+          fields={formFields}
+          apiEndpoint={apiEndPoint}
+          initialValues={initialValues}
+          readOnly={mode === "view"}
+        />
       </DialogContent>
 
       {/* <DialogActions sx={{gap:"5px"}}>

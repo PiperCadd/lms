@@ -11,6 +11,8 @@ import Link from "next/link";
 import { IconButton, Tooltip } from "@mui/material";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import Button from "@/ui/Button";
+import React from "react";
+import { useRouter } from "next/navigation";
 
 const RowLinkAction = ({ href }: { href: string }) => {
   return (
@@ -40,40 +42,50 @@ const RowLinkAction = ({ href }: { href: string }) => {
 };
 
 const Page = () => {
+  const router = useRouter();
+
   const columns: GridColDef[] = [
     { field: "id", headerName: "SL.No", width: 80 },
     {
       field: "name",
       headerName: "Name",
-      width: 200,
-      editable: true,
+      flex: 2,
     },
     {
       field: "email",
       headerName: "E-Mail",
-      width: 300,
-      editable: true,
+      flex: 2,
     },
     {
       field: "role",
       headerName: "Role",
-      width: 150,
-      editable: true,
+      flex: 1,
     },
 
     {
       field: "status",
       headerName: "Status",
-      width: 100,
+      flex: 1,
     },
   ];
+
+  const handleEdit = React.useCallback(
+    (id: number | string) => {
+      router.push(`/admin/team-members/${id}/edit`);
+    },
+    [router]
+  );
 
   return (
     <main className="text-white p-6">
       <h1 className="text-2xl mb-4">Team Members</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
-        <Button LinkComponent={'a'} href="/admin/team-members/add-team-member" sx={{width: "content-width"}} >
+        <SearchBar gridKey="teamMembers" />
+        <Button
+          LinkComponent={"a"}
+          href="/admin/team-members/add"
+          sx={{ width: "content-width" }}
+        >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Team Members</span>
         </Button>
@@ -86,6 +98,8 @@ const Page = () => {
       <Table
         rows={mockTeamMembers}
         columns={columns}
+        gridKey="teamMembers"
+        onEdit={handleEdit}
         renderActions={(params, handlers) => [
           <Actions
             key="crud"

@@ -8,8 +8,6 @@ import {
   StatsGridSkeleton,
 } from "@/components/admin/Skeleton";
 import Stats from "@/components/admin/stats";
-import { Grid } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 const payload = {

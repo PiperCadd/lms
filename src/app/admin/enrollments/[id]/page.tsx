@@ -1,18 +1,13 @@
 "use client";
 import Table from "@/components/admin/Table";
 import { GridColDef } from "@mui/x-data-grid";
-import { useUIStore } from "@/store/admin/useUIStore";
-import { HomeOutlined } from "@mui/icons-material";
-import Image from "next/image";
 import { courseDetailsMock } from "@/mockData";
 import ProgressCell from "@/ui/ProgressCell";
 import { SchoolOutlined } from "@mui/icons-material";
 import { VisibilityOutlined, TaskAlt } from "@mui/icons-material";
-import CustomForm from "@/components/common/CustomForm";
 import Link from "next/link";
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "SL.No", width: 100 },
@@ -20,20 +15,17 @@ const Page = () => {
       field: "lessonName",
       headerName: "Lesson Name",
       flex: 1,
-      editable: true,
     },
     {
       field: "progress",
       headerName: "Progress",
       flex: 1,
-      editable: true,
       renderCell: (params) => <ProgressCell value={params.value} />,
     },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
-      editable: true,
     },
   ];
 
@@ -41,7 +33,7 @@ const Page = () => {
     <>
       <div
         className="relative w-full h-96 p-12 flex flex-col rounded-2xl 
-                [background-image:var(--admin-bgimg)] bg-[var(--admin-card-bg)] mb-6"
+                [background-image:var(--admin-bgimg)] bg-(--admin-card-bg) mb-6"
       >
         <div className="bg-[#1e1e2f] w-full h-full rounded-xl p-6">
           <h1 className="flex gap-3 text-xl items-end pb-2 border-b border-zinc-700">
@@ -57,7 +49,7 @@ const Page = () => {
               <div>
                 <h3 className="text-gray-400">Status</h3>
                 <div className="text-green">
-                  <TaskAlt /> <span className="text-sm">Completed</span>
+                  <TaskAlt sx={{ fontSize: "18px"}} /> <span className="text-sm">Completed</span>
                 </div>
               </div>
               <div>

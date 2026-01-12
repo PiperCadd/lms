@@ -1,7 +1,15 @@
-import { Box, InputBase, IconButton } from "@mui/material";
+import { Box, InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useGridStore } from "@/store/admin/useGridStore";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  gridKey: string;
+}
+
+export default function SearchBar({ gridKey }: SearchBarProps) {
+  const store = useGridStore(gridKey);
+  const search = store((s) => s.search);
+  const setSearch = store((s) => s.setSearch);
   return (
     <Box
       sx={{
@@ -9,7 +17,7 @@ export default function SearchBar() {
         alignItems: "center",
         width: "300px",
         background: "var(--admin-body-bg)",
-        padding: "8px 14px",
+        padding: "2px 16px",
         borderRadius: "6px",
         border: "1px solid rgba(255,255,255,0.12)",
         backdropFilter: "blur(8px)",
@@ -20,9 +28,11 @@ export default function SearchBar() {
         },
       }}
     >
-      <SearchIcon sx={{ color: "var(--admin-gray)" }} />
+      <SearchIcon sx={{ fontSize:"20px", color: "var(--admin-gray)" }} />
 
       <InputBase
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
         placeholder="Search..."
         sx={{
           ml: 1,

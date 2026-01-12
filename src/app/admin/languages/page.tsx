@@ -11,21 +11,19 @@ import { mockLanguages } from "@/mockData";
 import CrudActions from "@/ui/Actions";
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
+  const { openDialog } = useUIStore();
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "SL.No", width: 100 },
+    { field: "id", headerName: "SL.No", width: 90 },
     {
       field: "code",
       headerName: "Language Code",
-      width: 300,
-      editable: true,
+      flex: 2,
     },
     {
       field: "name",
       headerName: "Language Name",
-      width: 300,
-      editable: true,
+      flex: 2,
     },
   ];
 
@@ -33,7 +31,7 @@ const Page = () => {
     <main className="text-white p-6">
       <h1 className="text-2xl mb-4">Languages</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
+        <SearchBar gridKey="languages" />
         <Button
           sx={{
             width: "fit-content",
@@ -41,14 +39,14 @@ const Page = () => {
             display: "flex",
             gap: "4px",
           }}
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => openDialog("language")}
           sizeVariant="small"
         >
           <AddIcon sx={{ fontSize: "1.2rem" }} />
           <span>Add Languages</span>
         </Button>
         <Dialog
-          title="Add Languages"
+          title="Languages"
           formFields={addLanguagesFormFields}
           apiEndPoint="/"
         />
@@ -56,6 +54,8 @@ const Page = () => {
       <Table
         rows={mockLanguages}
         columns={columns}
+        gridKey="languages"
+        onEdit={(id) => openDialog("category", id)}
         renderActions={(params, handlers) => [
           <CrudActions
             key="crud"

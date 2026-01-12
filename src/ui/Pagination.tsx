@@ -11,52 +11,47 @@ export default function Pagination() {
   const currentPage = useGridSelector(apiRef, gridPageSelector);
   const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 
-  const handlePageChange = (newPage: number) => {
-    apiRef.current.setPage(newPage);
+  const handlePageChange = (page: number) => {
+    apiRef.current.setPage(page);
   };
 
-  // ----- PAGINATION WINDOW -----
   const maxVisible = 3;
-
   let start = Math.max(0, currentPage - 1);
-  let end = start + maxVisible;
-
-  if (end > pageCount) {
-    end = pageCount;
-    start = Math.max(0, end - maxVisible);
-  }
+  const end = Math.min(pageCount, start + maxVisible);
+  if (end - start < maxVisible) start = Math.max(0, end - maxVisible);
 
   const visiblePages = Array.from(
     { length: end - start },
-    (_, idx) => start + idx
+    (_, i) => start + i
   );
 
   return (
     <Box
       display="flex"
       justifyContent="center"
-      p={1}
-      className="bg-[#0d1424] rounded-xl px-6 py-4"
+      pt={2.5}
+      px={1}
+      className="divide-x divide-gray-700"
     >
       {/* Previous */}
       <button
         disabled={currentPage === 0}
         onClick={() => handlePageChange(currentPage - 1)}
-        className="px-4 py-2 rounded-l text-blue-500 border border-gray-700 disabled:opacity-30 cursor-pointer"
+        className="px-4 py-2 border-y border-l border-gray-700 rounded-l text-blue-500 disabled:opacity-30"
       >
         «
       </button>
 
-      {/* Page numbers (max three) */}
+      {/* Pages */}
       {visiblePages.map((page) => (
         <button
           key={page}
           onClick={() => handlePageChange(page)}
-          className={`px-4 py-2 cursor-pointer
+          className={`px-4 py-2 border-y border-gray-700
             ${
               currentPage === page
-                ? "bg-white/10 text-white border-y border-l border-gray-700"
-                : "text-blue-500 hover:text-white border border-gray-700"
+                ? "bg-white/10 text-white"
+                : "text-blue-500 hover:text-white"
             }`}
         >
           {page + 1}
@@ -67,7 +62,7 @@ export default function Pagination() {
       <button
         disabled={currentPage === pageCount - 1}
         onClick={() => handlePageChange(currentPage + 1)}
-        className="px-4 py-2 text-blue-500 disabled:opacity-30 border-r border-y border-gray-700 rounded-r cursor-pointer"
+        className="px-4 py-2 border-y border-r border-gray-700 rounded-r text-blue-500 disabled:opacity-30"
       >
         »
       </button>

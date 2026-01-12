@@ -1,7 +1,7 @@
 import { Button as MuiButton, ButtonProps } from "@mui/material";
 
 interface CustomButtonProps extends ButtonProps {
-  variantColor?: "gradient" | "blue" | "pink";
+  variantColor?: "gradient" | "blue" | "pink" | "transparent";
   sizeVariant?: "small" | "medium" | "large" | "custom";
   padding?: string | number;
 }
@@ -14,9 +14,9 @@ const variants = {
     },
   },
   blue: {
-    background: "#1976d2",
+    background: "var(--admin-blue)",
     "&:hover": {
-      background: "#115293",
+      background: "var(--admin-blue-hover)",
     },
   },
   pink: {
@@ -25,6 +25,9 @@ const variants = {
       background: "#c2185b",
     },
   },
+  transparent: {
+    background: "transparent"
+  }
 };
 
 const Button = ({
@@ -38,7 +41,7 @@ const Button = ({
     small: {
       px: 2,
       py: 0.5,
-      fontSize: "0.5rem",
+      fontSize: "0.7rem",
     },
     medium: {
       px: 3.8,

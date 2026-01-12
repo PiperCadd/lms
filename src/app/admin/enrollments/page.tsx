@@ -4,13 +4,18 @@ import Button from "@/ui/Button";
 import SearchBar from "@/ui/SearchBar";
 import { GridColDef } from "@mui/x-data-grid";
 import Dialog from "@/ui/Dialog";
-import { useUIStore } from "@/store/admin/useUIStore";
 import { addDesignationFormFields } from "@/config/admin";
 import { mockEnrollments } from "@/mockData";
 import ProgressCell from "@/ui/ProgressCell";
 import { IconButton, Tooltip } from "@mui/material";
-import { ExitToAppOutlined, VisibilityOutlined, DownloadOutlined } from "@mui/icons-material";
+import {
+  ExitToAppOutlined,
+  VisibilityOutlined,
+  DownloadOutlined,
+} from "@mui/icons-material";
 import Link from "next/link";
+import { exportToCSV } from "@/utils/exportToCSV";
+import { GridFilters } from "@/components/admin/GridFilters";
 
 const RowLinkAction = ({ href }: { href: string }) => {
   return (
@@ -63,39 +68,35 @@ const CertificateLinkAction = ({ href }: { href: string }) => {
 };
 
 const Page = () => {
-  const { setIsDialogOpen } = useUIStore();
-
   const columns: GridColDef[] = [
     { field: "id", headerName: "SL.No", flex: 1 },
     {
       field: "course",
       headerName: "Course",
       flex: 3,
-      editable: true,
     },
     {
       field: "userName",
       headerName: "User Name",
       flex: 2,
-      editable: true,
     },
     {
       field: "status",
       headerName: "Status",
       flex: 2,
-      editable: true,
       renderCell: (params) => <ProgressCell value={params.value} />,
     },
     {
       field: "certificate",
       headerName: "Certificate",
-      align: "center",
       flex: 1.5,
       renderCell: (params) => {
         const href = params.row?.certificate;
 
         if (!href) {
-          return <span className="font-medium text-gray-400">Not Published</span>;
+          return (
+            <span className="font-medium text-gray-400">Not Published</span>
+          );
         }
 
         return <CertificateLinkAction href={href} />;
@@ -107,7 +108,31 @@ const Page = () => {
     <main className="text-white p-6">
       <h1 className="text-2xl mb-4">Enrollments</h1>
       <div className="flex justify-between mb-8">
-        <SearchBar />
+        <div className="flex gap-2">
+        <SearchBar gridKey="enrollments" />
+          <GridFilters
+            gridKey="enrollments"
+            filters={[
+              {
+                type:"dateRange",
+                field: "date",
+                label: "Enrolled",
+              },
+              {
+                type: "select",
+                field: "status",
+                placeholder: "All Status",
+                options: [
+                  "Web Development",
+                  "Machine Engineering",
+                  "Data Science",
+                  "CAD Modeling",
+                  "UI/UX",
+                ],
+              },
+            ]}
+          />
+        </div>
         <Button
           sizeVariant="small"
           sx={{
@@ -118,6 +143,7 @@ const Page = () => {
             display: "flex",
             gap: "4px",
           }}
+          onClick={() => exportToCSV(mockEnrollments, "enrollments.csv")}
         >
           <ExitToAppOutlined sx={{ fontSize: "1.2rem" }} />
           <span>Export</span>{" "}
@@ -131,6 +157,7 @@ const Page = () => {
       <Table
         rows={mockEnrollments}
         columns={columns}
+        gridKey="enrollments"
         renderActions={(params) => [
           <RowLinkAction key="view" href={`/admin/enrollments/${params.id}`} />,
         ]}

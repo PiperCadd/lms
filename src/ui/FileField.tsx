@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TextField as MuiTextField,
   TextFieldProps,
-  InputAdornment,
-  IconButton,
   Box,
   Typography,
 } from "@mui/material";
@@ -13,21 +11,27 @@ interface FileFieldProps extends Omit<TextFieldProps, "type"> {
   onFileSelect?: (file: File | null) => void;
   previewHeight?: number;
   existingPreviewUrl?: string;
+  accept?: string;
 }
 
 const FileField = ({
   sx,
   onChange,
+  onFileSelect,
   inputRef,
   previewHeight = 120,
   existingPreviewUrl,
+  accept,
   ...props
 }: FileFieldProps) => {
   const [file, setFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null;
+    const input = event.target;
+    if (!input.files) return;
+
+    const selectedFile = input.files[0] ?? null;
 
     setFile(selectedFile);
 
@@ -37,6 +41,8 @@ const FileField = ({
     } else {
       setPreviewUrl(null);
     }
+
+    onFileSelect?.(selectedFile);
     onChange?.(event);
   };
 
@@ -46,6 +52,13 @@ const FileField = ({
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  useEffect(() => {
+  if (existingPreviewUrl) {
+    setPreviewUrl(existingPreviewUrl);
+  }
+}, [existingPreviewUrl]);
+
 
   return (
     <div>
@@ -108,6 +121,9 @@ const FileField = ({
           inputLabel: { shrink: false },
           input: {
             sx: { color: "#fff" },
+          },
+          htmlInput: {
+            accept,
           },
         }}
       />

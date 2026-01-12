@@ -16,6 +16,12 @@ import FileField from "@/ui/FileField";
 import { useFormHandler } from "@/hooks/admin/customHooks";
 import useFormOptions from "@/hooks/admin/useFormOptions";
 import { useAppStore } from "@/store/admin/useAppStore";
+import RadioGroup from "@/ui/RadioGroup";
+import DynamicFields from "./DynamicFields";
+import InnerDynamicFields from "./InnerDynamicFields";
+import MuiCheckbox from "@mui/material/Checkbox";
+import { useUIStore } from "@/store/admin/useUIStore";
+import Dropdown from "@/ui/Dropdown";
 
 // -----------------------------
 // Types
@@ -29,9 +35,13 @@ export type FieldType =
   | "number"
   | "file"
   | "date"
-  | "checkbox";
+  | "checkbox"
+  | "radio"
+  | "dynamic-array"
+  | "dynamic-inner-array"
+  | "chooseOne";
 
-export type PrimitiveOption = string | number;
+export type PrimitiveOption = string | number | boolean;
 
 export type FieldOption =
   | PrimitiveOption
@@ -44,15 +54,19 @@ export type FieldDefinition = {
   name: string;
   label?: string;
   type: FieldType;
+  itemFields?: FieldDefinition[];
   placeholder?: string;
   required?: boolean;
+  fileFormatsToAccept?: string;
   min?: number;
   max?: number;
   options?: FieldOption[];
   optionsKey?: string;
+  selectOptions?: string | string[];
   defaultValue?: string | boolean;
   helperText?: string;
   row?: number;
+  colSpan?: number;
 };
 
 export type ExternalLink = {
@@ -72,6 +86,7 @@ export type CustomFormProps<T extends ZodType = ZodType> = {
   zodSchema?: ZodObject<any> | null; // optional override
   externalLink?: ExternalLink[] | [];
   initialValues?: Record<string, any>; // EDIT SUPPORT
+  readOnly?: boolean;
 };
 
 // Utility: build dynamic zod schema from fields
@@ -121,9 +136,66 @@ const buildZodSchema = (fields: FieldDefinition[]) => {
             message: "File is required",
           });
         break;
-      case "checkbox":
-        schema = z.boolean();
+      // case "checkbox": {
+      //   const hasMultiple = Array.isArray(f.options) && f.options.length > 1;
+
+      //   if (hasMultiple) {
+      //     // array of selected values
+      //     schema = z.array(z.string());
+
+      //     if (required) {
+      //       schema = schema.refine(
+      //         (arr) => Array.isArray(arr) && arr.length > 0,
+      //         { message: `${f.label || name} is required` }
+      //       );
+      //     }
+      //   } else {
+      //     // single checkbox boolean
+      //     schema = z.boolean();
+
+      //     if (required) {
+      //       schema = schema.refine((v) => v === true, {
+      //         message: `${f.label || name} is required`,
+      //       });
+      //     }
+      //   }
+
+      //   break;
+      // }
+
+      case "dynamic-array": {
+        const subShape: Record<string, ZodType> = {};
+
+        f.itemFields?.forEach((sub) => {
+          let s = z.string().min(1, `${sub.label} required`);
+          subShape[sub.name] = s;
+        });
+
+        schema = z.array(z.object(subShape));
+
+        if (required) {
+          schema = schema.min(1, `${f.label || name} is required`);
+        }
+
         break;
+      }
+
+      case "chooseOne": {
+        schema = z
+          .object({
+            checked: z.boolean(),
+            value: z.string().optional(),
+          })
+          .refine(
+            (v) => !v.checked || (v.checked && v.value && v.value.length > 0),
+            {
+              message: `${f.label || name} is required`,
+              path: ["value"],
+            }
+          );
+        break;
+      }
+
       default:
         schema = z.any();
     }
@@ -150,24 +222,25 @@ const buildZodSchema = (fields: FieldDefinition[]) => {
 };
 
 // Form Fields
-const FormField = React.memo(
+export const FormField = React.memo(
   ({
     field,
     initialValues,
     control,
     register,
     errors,
-    optionsMap,
+    readOnly,
   }: {
     field: FieldDefinition;
     initialValues: any;
     control: any;
     register: any;
     errors: any;
-    optionsMap?: FieldOption[];
+    readOnly: any;
   }) => {
     const name = field.name;
     const error = errors?.[name];
+    const isView = readOnly === true;
 
     switch (field.type) {
       case "textarea":
@@ -183,6 +256,7 @@ const FormField = React.memo(
                 type={field.type}
                 label={field.label}
                 placeholder={field.placeholder}
+                InputProps={{ readOnly: isView }}
                 multiline={true}
                 error={!!error}
                 helperText={error?.message || field.helperText}
@@ -191,49 +265,21 @@ const FormField = React.memo(
           />
         );
       case "select": {
-        const resolvedOptions =
-          field.options ??
-          (field.optionsKey ? optionsMap?.[field.optionsKey] : []);
-
-        const hasOptions =
-          Array.isArray(resolvedOptions) && resolvedOptions.length > 0;
-
         return (
           <Controller
             name={name}
             control={control}
             defaultValue={field.defaultValue ?? ""}
             render={({ field: ctrlField }) => (
-              <TextField
-                id={field.name}
-                {...ctrlField}
-                select
+              <Dropdown
+                // {...ctrlField}
                 label={field.label}
-                error={!!error}
-                helperText={error?.message || field.helperText}
-                disabled={!hasOptions}
-              >
-                {/* ALWAYS pass children */}
-                {!hasOptions && (
-                  <MenuItem value="" disabled>
-                    Loading...
-                  </MenuItem>
-                )}
-
-                {hasOptions &&
-                  resolvedOptions.map((option, i) => {
-                    const value =
-                      typeof option === "object" ? option.value : option;
-                    const label =
-                      typeof option === "object" ? option.label : option;
-
-                    return (
-                      <MenuItem key={i} value={value}>
-                        {label}
-                      </MenuItem>
-                    );
-                  })}
-              </TextField>
+                placeholder={field.placeholder}
+                value={ctrlField.value}
+                onChange={ctrlField.onChange}
+                optionsKey={field.optionsKey}
+                options={field.selectOptions as string[]}
+              />
             )}
           />
         );
@@ -248,11 +294,17 @@ const FormField = React.memo(
               <TextField
                 id={field.name}
                 {...ctrlField}
-                type={field.type}
+                type="number"
                 label={field.label}
                 placeholder={field.placeholder}
                 error={!!error}
                 helperText={error?.message || field.helperText}
+                inputProps={{
+                  readOnly: isView,
+                  min: field.min,
+                  max: field.max,
+                  step: 1, // integers only
+                }}
               />
             )}
           />
@@ -269,34 +321,144 @@ const FormField = React.memo(
                 error={!!error}
                 helperText={error?.message || field.helperText}
                 existingPreviewUrl={initialValues?.profileImageUrl}
+                accept={field.fileFormatsToAccept}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const file = e.currentTarget.files?.[0] ?? null;
                   ctrlField.onChange(file);
                 }}
+                disabled={isView}
+                // hideUpload={isView}
                 inputRef={ctrlField.ref}
               />
             )}
           />
         );
-      case "checkbox":
+      case "checkbox": {
+        const hasMultiple =
+          Array.isArray(field.options) && field.options.length > 1;
+
         return (
           <Controller
             name={name}
             control={control}
-            defaultValue={field.defaultValue ?? false}
+            defaultValue={hasMultiple ? [] : false}
             render={({ field: ctrlField }) => (
               <FormControl error={!!error}>
-                <FormControlLabel
-                  control={
-                    <Checkbox {...ctrlField} checked={ctrlField.value} />
-                  }
+                <Checkbox
                   label={field.label}
+                  value={ctrlField.value}
+                  disabled={isView}
+                  onChange={ctrlField.onChange}
+                  options={field.options}
+                  row={field.row}
                 />
-                {error && <FormHelperText>{error.message}</FormHelperText>}
+                {error && (
+                  <FormHelperText>{error.message || error}</FormHelperText>
+                )}
               </FormControl>
             )}
           />
         );
+      }
+
+      case "radio":
+        return (
+          <Controller
+            name={name}
+            control={control}
+            defaultValue={field.defaultValue ?? (false || "")}
+            render={({ field: ctrlField }) => (
+              <RadioGroup
+                label={field.label}
+                value={ctrlField.value}
+                disabled={isView}
+                onChange={ctrlField.onChange}
+                options={field.options}
+                error={error?.message}
+              />
+            )}
+          />
+        );
+
+      case "dynamic-array":
+        return (
+          <DynamicFields
+            control={control}
+            name={field.name}
+            itemFields={field.itemFields}
+            label={field.label}
+            errors={errors}
+            register={register}
+          />
+        );
+
+      case "dynamic-inner-array":
+        return (
+          <InnerDynamicFields
+            control={control}
+            name={field.name}
+            itemFields={field.itemFields}
+            label={field.label}
+            errors={errors}
+            register={register}
+          />
+        );
+
+      case "chooseOne":
+        return (
+          <Controller
+            name={name}
+            control={control}
+            defaultValue={{ checked: false, value: "" }}
+            render={({ field: ctrlField }) => {
+              const { checked, value } = ctrlField.value || {};
+
+              return (
+                <FormControl error={!!error} fullWidth>
+                  <div className="flex items-center gap-3">
+                    {/* Checkbox */}
+                    <MuiCheckbox
+                      checked={!!checked}
+                      onChange={(e) =>
+                        ctrlField.onChange({
+                          ...ctrlField.value,
+                          checked: e.target.checked,
+                        })
+                      }
+                      sx={{
+                        "& .MuiSvgIcon-root": {
+                          color: "var(--border-color)",
+                        },
+                        "&.Mui-checked .MuiSvgIcon-root": {
+                          color: "#1976d2",
+                        },
+                      }}
+                    />
+
+                    {/* Text Input */}
+                    <TextField
+                      value={value}
+                      onChange={(e) =>
+                        ctrlField.onChange({
+                          ...ctrlField.value,
+                          value: e.target.value,
+                        })
+                      }
+                      placeholder={field.placeholder}
+                      error={!!error}
+                      InputProps={{ readOnly: isView }}
+                      helperText={error?.message || field.helperText}
+                      sx={{ flex: 1 }}
+                    />
+                  </div>
+
+                  {error && <FormHelperText>{error.message}</FormHelperText>}
+                </FormControl>
+              );
+            }}
+          />
+        );
+
       default:
         // text / email/ password
         return (
@@ -308,6 +470,7 @@ const FormField = React.memo(
               <TextField
                 id={field.name}
                 {...ctrlField}
+                InputProps={{ readOnly: isView }}
                 type={field.type}
                 label={field.label}
                 placeholder={field.placeholder}
@@ -332,8 +495,10 @@ export default function CustomForm({
   className = "",
   zodSchema = null,
   initialValues,
+  readOnly,
 }: CustomFormProps) {
   const { setTost } = useAppStore();
+  const { editingId, mode, editingType } = useUIStore();
 
   const renderLinks = useCallback(
     (destination: "above" | "below") => {
@@ -383,20 +548,38 @@ export default function CustomForm({
 
   type SchemaType = z.infer<typeof schema>;
 
-  const defaultValues = useMemo(
-    () =>
-      fields.reduce(
-        (a, f) => ({ ...a, [f.name]: f.defaultValue ?? undefined }),
-        {}
-      ),
-    [fields]
-  );
+  // const defaultValues = useMemo(
+  //   () =>
+  //     fields.reduce(
+  //       (a, f) => ({ ...a, [f.name]: f.defaultValue ?? undefined }),
+  //       {}
+  //     ),
+  //   [fields]
+  // );
+
+  const defaultValues = useMemo(() => {
+    if (initialValues) return initialValues;
+
+    return fields.reduce((acc, f) => {
+      acc[f.name] = f.type === "dynamic-array" ? [] : f.defaultValue ?? "";
+      return acc;
+    }, {} as Record<string, any>);
+  }, [fields, initialValues]);
 
   const { control, handleSubmit, register, formState, setFocus, reset } =
     useForm<SchemaType>({
       resolver: zodResolver(schema as any),
       defaultValues,
     });
+
+  useEffect(() => {
+    if ((mode === "edit" || mode === "view") && editingId) {
+      // fetch data ONCE
+      fetch(`/api/${editingType}/${editingId}`)
+        .then((res) => res.json())
+        .then((data) => reset(data));
+    }
+  }, [editingId, mode, editingType, reset]);
 
   const { errors, isSubmitting } = formState;
 
@@ -424,13 +607,25 @@ export default function CustomForm({
   const { handleApiSubmit, loading, error, success } = useFormHandler({
     apiEndpoint,
     method,
-    onError: () => setTost(true),
+    // onError: () => setTost(true),
   });
+
+  // const { addCourse } = useCourseStore();
 
   const submitHandler: SubmitHandler<SchemaType> = useCallback(
     async (data) => {
       // file fields will be FileList objects; convert if needed
       console.log("✅ Raw form data before normalization:", data);
+      //     const normalized = {
+      //   ...data,
+      //   chapters: data.chapters.map((c) => ({
+      //     title: c.title,
+      //     description: c.description,
+      //     material: c.material instanceof File ? c.material : null,
+      //   })),
+      // };
+
+      // addCourse(normalized);
 
       const normalized = { ...data } as any;
 
@@ -455,18 +650,8 @@ export default function CustomForm({
     return acc;
   }, {} as Record<number, FieldDefinition[]>);
 
-  const optionKeys = useMemo(
-    () =>
-      Array.from(
-        new Set(fields.map((f) => f.optionsKey).filter(Boolean) as string[])
-      ),
-    [fields]
-  );
-
-  const { optionsMap } = useFormOptions(optionKeys);
-
   return (
-    <form className="" onSubmit={handleSubmit(submitHandler)}>
+    <form className="w-full" onSubmit={handleSubmit(submitHandler)}>
       <div className="flex flex-col gap-4">
         {fields.map((field) => {
           // If field is part of a row group, skip here (we will render it later)
@@ -479,38 +664,81 @@ export default function CustomForm({
               control={control}
               register={register}
               errors={errors}
-              optionsMap={optionsMap}
             />
           );
         })}
 
         {/* Render all rows */}
-        {Object.keys(rows).map((rowKey) => (
-          <div key={rowKey} className="grid grid-cols-3 gap-4">
-            {rows[+rowKey].map((field) => (
-              <FormField
-                key={field.name}
-                field={field}
-                initialValues={initialValues}
-                control={control}
-                register={register}
-                errors={errors}
-                optionsMap={optionsMap}
-              />
-            ))}
-          </div>
-        ))}
+        {Object.keys(rows)
+          .sort((a, b) => Number(a) - Number(b))
+          .map((rowKey) => {
+            const rowFields = rows[+rowKey];
+
+            return (
+              <div key={rowKey} className="grid grid-cols-12 gap-4">
+                {rowFields.map((field) => {
+                  // Determine span
+                  const span: number =
+                    field.type === "dynamic-array" ? 12 : field.colSpan ?? 12;
+                  const limitedSpan = Math.min(span, 12) as
+                    | 1
+                    | 2
+                    | 3
+                    | 4
+                    | 5
+                    | 6
+                    | 7
+                    | 8
+                    | 9
+                    | 10
+                    | 11
+                    | 12;
+
+                  // Map to Tailwind class
+                  const spanClassMap: Record<typeof limitedSpan, string> = {
+                    1: "col-span-1",
+                    2: "col-span-2",
+                    3: "col-span-3",
+                    4: "col-span-4",
+                    5: "col-span-5",
+                    6: "col-span-6",
+                    7: "col-span-7",
+                    8: "col-span-8",
+                    9: "col-span-9",
+                    10: "col-span-10",
+                    11: "col-span-11",
+                    12: "col-span-12",
+                  };
+
+                  return (
+                    <div key={field.name} className={spanClassMap[limitedSpan]}>
+                      <FormField
+                        field={field}
+                        initialValues={initialValues}
+                        control={control}
+                        register={register}
+                        errors={errors}
+                        readOnly={readOnly}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
       </div>
       {renderLinks("above")}
-      <Button
-        sx={{ mt: "16px", width: "fit-content", float: "right" }}
-        type="submit"
-        disabled={isSubmitting}
-        sizeVariant="medium"
-        variant="contained"
-      >
-        {buttonName}
-      </Button>
+      {!readOnly && (
+        <Button
+          sx={{ mt: "16px", width: "fit-content", float: "right" }}
+          type="submit"
+          disabled={isSubmitting}
+          sizeVariant="medium"
+          variant="contained"
+        >
+          {buttonName}
+        </Button>
+      )}
       {renderLinks("below")}
     </form>
   );

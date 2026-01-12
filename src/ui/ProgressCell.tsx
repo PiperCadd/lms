@@ -20,17 +20,7 @@ const ProgressCell: React.FC<ProgressCellProps> = ({ value }) => {
 
   if (progress >= 100) {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
         <Chip value="Completed" />
-      </Box>
     );
   }
 
@@ -40,7 +30,6 @@ const ProgressCell: React.FC<ProgressCellProps> = ({ value }) => {
         width: "100%",
         height: "100%",                 // allow centering vertically inside row
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",           // vertical + horizontal center
       }}
     >

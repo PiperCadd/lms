@@ -11,6 +11,7 @@ const TextField = ({
   sx,
   type = "text",
   multiline = false,
+  label,
   rows,
   ...props
 }: TextFieldProps) => {
@@ -22,7 +23,8 @@ const TextField = ({
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 
   return (
-    <>
+    <div>
+      <label className="text-sm text-[#e6ecf0] mb-2 block">{label}</label>
       <MuiTextField
         {...props}
         type={!multiline ? inputType : undefined}
@@ -41,6 +43,11 @@ const TextField = ({
             lineHeight: "calc(1.25 / 0.875)",
             color: "#e6ecf0",
             marginBottom: "4px",
+            display: "none",
+          },
+          "& .MuiFormHelperText-root": {
+            color: "var(--admin-gray)", // helper text color
+            marginLeft: 0,
           },
           "& .MuiInputLabel-root.Mui-focused": {
             color: "#fff !important", // label when focused
@@ -70,9 +77,10 @@ const TextField = ({
         }}
         slotProps={{
           // eye icon only for password fields
-          inputLabel: { shrink: false },
+          // inputLabel: { shrink: false },
           input: {
-                notched: false,
+            notched: false,
+            label: false,
             sx: { color: "#fff" }, // input text color
             endAdornment: isPassword ? (
               <InputAdornment position="end">
@@ -99,7 +107,7 @@ const TextField = ({
             : undefined,
         }}
       />
-    </>
+    </div>
   );
 };
 

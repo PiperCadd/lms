@@ -4,28 +4,28 @@ import {
   DataGrid,
   GridColDef,
   GridActionsCellItem,
-  GridRowModes,
-  GridRowModesModel,
   GridRowId,
   GridRowModel,
   GridRowsProp,
   GridToolbarContainer,
   GridRowParams,
   useGridApiRef,
+  DataGridProps,
 } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import Button from "@mui/material/Button";
 import { useConfirmDialogStore } from "@/hooks/admin/useConfirmDialogStore";
 import Pagination from "@/ui/Pagination";
+import { useGridStore } from "@/store/admin/useGridStore";
+import { filterRows } from "@/utils/filterRows";
 
-interface TableProps {
+interface TableProps extends Omit<DataGridProps, "rows" | "columns"> {
   rows: GridRowsProp;
   columns: GridColDef[];
   title?: string;
+  gridKey?: string;
   renderActions?: (
     params: GridRowParams,
     handlers: {
@@ -56,14 +56,11 @@ function EditToolbar({ onAdd }: { onAdd?: () => void }) {
   );
 }
 
-function findIndexById(rows: GridRowsProp, id: GridRowId) {
-  return rows.findIndex((r: any) => r.id === id);
-}
-
 const Table: React.FC<TableProps> = ({
   rows,
   columns,
   title,
+  gridKey,
   renderActions,
   onAdd,
   onEdit,
@@ -71,16 +68,9 @@ const Table: React.FC<TableProps> = ({
   onDelete,
   onCancel,
   onToggle,
+  ...restProps
 }) => {
   const apiRef = useGridApiRef();
-
-  // Keep data in state but sync when `rows` prop changes.
-  const [data, setData] = React.useState<GridRowsProp>(rows);
-  React.useEffect(() => setData(rows), [rows]);
-
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
-    {}
-  );
 
   // Pull dialog methods once to avoid repeated getter calls.
   const { showDialog, closeDialog, setLoading } = useConfirmDialogStore();
@@ -114,40 +104,9 @@ const Table: React.FC<TableProps> = ({
   // Handlers (stable via useCallback)
   const handleEditClick = React.useCallback(
     (id: GridRowId) => () => {
-      setRowModesModel((prev) => ({
-        ...prev,
-        [id]: { mode: GridRowModes.Edit },
-      }));
       onEditRef.current?.(id);
     },
     []
-  );
-
-  const handleCancelClick = React.useCallback(
-    (id: GridRowId) => () => {
-      setRowModesModel((prev) => ({
-        ...prev,
-        [id]: { mode: GridRowModes.View, ignoreModifications: true },
-      }));
-      onCancelRef.current?.(id);
-    },
-    []
-  );
-
-  const handleSaveClick = React.useCallback(
-    (id: GridRowId) => () => {
-      showDialog({
-        title: "Save Changes?",
-        description: "Do you want to update this record?",
-        confirmText: "Save",
-        onConfirm: () => {
-          // Stop edit mode (this will call processRowUpdate)
-          apiRef.current.stopRowEditMode({ id });
-          closeDialog();
-        },
-      });
-    },
-    [apiRef, showDialog, closeDialog]
   );
 
   const handleDeleteClick = React.useCallback(
@@ -159,14 +118,6 @@ const Table: React.FC<TableProps> = ({
         isDestructive: true,
         onConfirm: async () => {
           setLoading(true);
-          // Optimized remove by index
-          setData((prev) => {
-            const idx = findIndexById(prev, id);
-            if (idx === -1) return prev;
-            const clone = [...prev];
-            clone.splice(idx, 1);
-            return clone;
-          });
           onDeleteRef.current?.(id);
           setLoading(false);
           closeDialog();
@@ -191,13 +142,6 @@ const Table: React.FC<TableProps> = ({
         confirmText: isActive ? "Deactivate" : "Activate",
         onConfirm: async () => {
           setLoading(true);
-
-          setData((prev) =>
-            prev.map((item) =>
-              item.id === id ? { ...item, isActive: !isActive } : item
-            )
-          );
-
           onToggleRef.current?.(id, !isActive);
 
           setLoading(false);
@@ -208,59 +152,13 @@ const Table: React.FC<TableProps> = ({
     [showDialog, closeDialog, setLoading]
   );
 
-  // processRowUpdate: minimal work and id-based update for performance
-  const processRowUpdate = React.useCallback(
-    (newRow: any) => {
-      // Basic validation: return previous row if invalid (don't throw)
-      if (!newRow.name) {
-        // you can integrate toast/notification here instead of throwing
-        // keep grid stable by returning the previous state for this row
-        const prevIdx = findIndexById(data, newRow.id);
-        return data[prevIdx] ?? newRow;
-      }
-
-      setData((prev) => {
-        const idx = findIndexById(prev, newRow.id);
-        if (idx === -1) return prev;
-        const clone = [...prev];
-        clone[idx] = { ...clone[idx], ...newRow };
-        return clone;
-      });
-
-      onSaveRef.current?.(newRow);
-      return newRow;
-    },
-    [data]
-  );
-
   // getActions separated and memoized to avoid regenerating entire columns array
   const getActions = React.useCallback(
     (params: GridRowParams) => {
-      const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-
-      if (isEditing) {
-        return [
-          <GridActionsCellItem
-            key="save"
-            icon={<SaveIcon />}
-            label="Save"
-            onClick={handleSaveClick(params.id)}
-          />,
-          <GridActionsCellItem
-            key="cancel"
-            icon={<CancelIcon />}
-            label="Cancel"
-            onClick={handleCancelClick(params.id)}
-          />,
-        ];
-      }
-
       if (renderActions) {
         return renderActions(params, {
           edit: handleEditClick(params.id),
           delete: handleDeleteClick(params.id),
-          save: handleSaveClick(params.id),
-          cancel: handleCancelClick(params.id),
           toggle: handleToggleClick(params),
         });
       }
@@ -280,15 +178,7 @@ const Table: React.FC<TableProps> = ({
         />,
       ];
     },
-    [
-      rowModesModel,
-      renderActions,
-      handleEditClick,
-      handleDeleteClick,
-      handleSaveClick,
-      handleCancelClick,
-      handleToggleClick,
-    ]
+    [renderActions, handleEditClick, handleDeleteClick, handleToggleClick]
   );
 
   const mergedColumns: GridColDef[] = React.useMemo(() => {
@@ -314,6 +204,7 @@ const Table: React.FC<TableProps> = ({
       borderRadius: "var(--border-radius-lg)",
       color: "var(--admin-text-white)",
       border: "none",
+      "--DataGrid-rowBorderColor": "var(--border-color)",
       "& .MuiCheckbox-root": { color: "#fff !important" },
       "& .MuiDataGrid-main": {
         borderTopLeftRadius: "var(--border-radius-sm)",
@@ -334,6 +225,9 @@ const Table: React.FC<TableProps> = ({
         backgroundColor: "rgba(255,255,255,0.1) !important",
       },
       "& .Mui-focusVisible": { outline: "none" },
+      "& .MuiDataGrid-row:last-of-type": {
+        borderBottom: "1px solid var(--DataGrid-rowBorderColor)",
+      },
       "& .MuiDataGrid-row.Mui-selected": {
         backgroundColor: "var(--white-10)",
       },
@@ -363,6 +257,9 @@ const Table: React.FC<TableProps> = ({
       "& .MuiTablePagination-selectLabel": { color: "#fff" },
       "& .MuiTablePagination-select": { color: "#fff" },
       "& .MuiTablePagination-actions svg": { fill: "#fff" },
+      "& .MuiDataGrid-virtualScroller": {
+        // paddingBottom: "10px",
+      },
       // Highest-specificity selector for editing row
       "& .MuiDataGrid-virtualScrollerRenderZone > div.MuiDataGrid-row.MuiDataGrid-row--editing":
         {
@@ -381,6 +278,12 @@ const Table: React.FC<TableProps> = ({
           backgroundColor: "var(--white-20) !important",
           color: "#fff !important",
         },
+      // Custom ClassName for Rating Coulmn of Feedback Page
+      "& .rating-cell": {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
     }),
     []
   );
@@ -389,6 +292,21 @@ const Table: React.FC<TableProps> = ({
   const Toolbar = React.useMemo(
     () => (onAdd ? () => <EditToolbar onAdd={onAdd} /> : undefined),
     [onAdd]
+  );
+
+  // Search & Filter Functionalities
+
+  const store = useGridStore(gridKey!);
+  const { search, filters } = store();
+
+  const filteredRows = React.useMemo(
+    () =>
+      filterRows({
+        rows,
+        search,
+        filters,
+      }),
+    [rows, search, filters]
   );
 
   return (
@@ -407,14 +325,8 @@ const Table: React.FC<TableProps> = ({
       {title && <h6 className="mb-4 font-bold">{title}</h6>}
       <DataGrid
         apiRef={apiRef}
-        rows={data}
+        rows={filteredRows}
         columns={mergedColumns}
-        editMode="row"
-        isCellEditable={() => false}
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={setRowModesModel}
-        processRowUpdate={processRowUpdate}
-        onProcessRowUpdateError={(error) => console.error(error)}
         disableRowSelectionOnClick
         initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
         pageSizeOptions={[5]}
@@ -423,6 +335,7 @@ const Table: React.FC<TableProps> = ({
           toolbar: Toolbar,
           pagination: Pagination,
         }}
+        {...restProps}
       />
     </Box>
   );

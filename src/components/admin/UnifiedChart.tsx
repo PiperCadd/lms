@@ -22,7 +22,7 @@ const UnifiedChart: React.FC<UnifiedChartProps> = ({
   categories = [],
   height = "100%",
   primaryColor = "#C3FF43",
-  secondaryColor = "#1C2340",
+  secondaryColor = "#a7acb1",
 }) => {
   const areaOptions: ApexCharts.ApexOptions = {
     chart: {
@@ -85,7 +85,7 @@ const UnifiedChart: React.FC<UnifiedChartProps> = ({
     colors: [primaryColor],
     plotOptions: {
       radialBar: {
-        hollow: { size: "60%" },
+        hollow: { size: "52%" },
         track: { background: secondaryColor },
         dataLabels: { show: false },
       },
